@@ -1,1 +1,1 @@
-export default ["container", "eyes"];
+export default ["container", "browser", "eyes"];

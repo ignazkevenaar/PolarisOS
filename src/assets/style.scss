@@ -1,0 +1,112 @@
+:root {
+  --border-width: 2px;
+
+  // Theme
+  --color-desktop: 92 144 164;
+  --color-surface-active: 195 179 169;
+  --color-surface-inactive: 195 179 169;
+  --color-primary-active: 227 171 121;
+  --color-primary-inactive: 153 153 153;
+  --color-secondary-active: 92 144 164;
+  --color-secondary-inactive: 140 152 168;
+  --color-tertiary-active: 176 137 141;
+  --color-tertiary-inactive: 165 153 144;
+  --color-field-active: 105 111 128;
+  --color-field-inactive: 165 153 144;
+
+  @mixin color-variation($name) {
+    --color-#{$name}-light: color-mix(
+      in srgb,
+      rgb(var(--color-#{$name})),
+      white 50%
+    );
+    --color-#{$name}-dark: color-mix(
+      in srgb,
+      rgb(var(--color-#{$name})),
+      black 10%
+    );
+  }
+
+  @include color-variation(surface-active);
+  @include color-variation(surface-inactive);
+  @include color-variation(primary-active);
+  @include color-variation(primary-inactive);
+  @include color-variation(secondary-active);
+  @include color-variation(secondary-inactive);
+  @include color-variation(tertiary-active);
+  @include color-variation(tertiary-inactive);
+  @include color-variation(field-active);
+  @include color-variation(field-inactive);
+}
+
+::selection {
+  background-color: rgb(var(--color-tertiary-inactive));
+}
+
+.active *::selection {
+  background-color: rgb(var(--color-tertiary-active));
+}
+
+@mixin color-variation-classes($name) {
+  .color-#{$name} {
+    --local-color: var(--color-#{$name}-inactive);
+    --local-color-light: var(--color-#{$name}-inactive-light);
+    --local-color-dark: var(--color-#{$name}-inactive-dark);
+
+    background-color: rgb(var(--local-color));
+    color: contrast-color(rgb(var(--local-color)));
+
+    &.active {
+      --local-color: var(--color-#{$name}-active);
+      --local-color-light: var(--color-#{$name}-active-light);
+      --local-color-dark: var(--color-#{$name}-active-dark);
+    }
+  }
+}
+
+@include color-variation-classes(surface);
+@include color-variation-classes(primary);
+@include color-variation-classes(secondary);
+@include color-variation-classes(tertiary);
+@include color-variation-classes(field);
+
+.bevel,
+.emboss {
+  background: rgb(var(--local-color));
+  color: contrast-color(rgb(var(--local-color)));
+}
+
+.bevel {
+  border-left: var(--border-width) outset var(--local-color-light);
+  border-top: var(--border-width) outset var(--local-color-light);
+  border-right: var(--border-width) outset var(--local-color-dark);
+  border-bottom: var(--border-width) outset var(--local-color-dark);
+
+  &.interactive {
+    cursor: pointer;
+
+    &:enabled:active {
+      border-left: var(--border-width) inset var(--local-color-dark);
+      border-top: var(--border-width) inset var(--local-color-dark);
+      border-right: var(--border-width) inset var(--local-color-light);
+      border-bottom: var(--border-width) inset var(--local-color-light);
+    }
+  }
+}
+
+.emboss {
+  border-left: var(--border-width) inset var(--local-color-dark);
+  border-top: var(--border-width) inset var(--local-color-dark);
+  border-right: var(--border-width) inset var(--local-color-light);
+  border-bottom: var(--border-width) inset var(--local-color-light);
+}
+
+.text-shadow {
+  // No custom contrast-color? No problem!
+  text-shadow: 0 2px
+    color-mix(
+      in srgb,
+      contrast-color(contrast-color(rgb(var(--local-color)))),
+      transparent 50%
+    );
+}

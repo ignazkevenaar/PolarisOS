@@ -1,6 +1,7 @@
 import { computed, markRaw, ref } from "vue";
 
 const windows = ref({});
+const focusOrder = ref([]);
 const windowOrder = ref([]);
 const hiddenWindows = ref(new Set());
 
@@ -18,17 +19,18 @@ export function useWindowManager() {
       ...options,
     };
 
+    focusOrder.value.push(newID);
     windowOrder.value.push(newID);
   };
 
   const bringToFront = (windowID) => {
-    const index = windowOrder.value.indexOf(windowID);
+    const index = focusOrder.value.indexOf(windowID);
     if (index < 0) {
       console.error("No window!");
     }
 
-    const element = windowOrder.value.splice(index, 1);
-    windowOrder.value.splice(windowOrder.value.length, 0, element[0]);
+    const element = focusOrder.value.splice(index, 1);
+    focusOrder.value.splice(focusOrder.value.length, 0, element[0]);
   };
 
   const move = (windowID, position) => {
@@ -45,6 +47,8 @@ export function useWindowManager() {
 
   const close = (windowID) => {
     delete windows.value[windowID];
+    const focusIndex = focusOrder.value.indexOf(windowID);
+    focusOrder.value.splice(focusIndex, 1);
     const orderIndex = windowOrder.value.indexOf(windowID);
     windowOrder.value.splice(orderIndex, 1);
   };
@@ -77,9 +81,14 @@ export function useWindowManager() {
     return idSet;
   });
 
+  const changeTitle = (windowID, title) => {
+    windows.value[windowID].title = title;
+  };
+
   return {
     windows,
     windowOrder,
+    focusOrder,
     hiddenWindows,
     openWindowIDs,
     register,
@@ -90,5 +99,6 @@ export function useWindowManager() {
     close,
     hide,
     show,
+    changeTitle,
   };
 }

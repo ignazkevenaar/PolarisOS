@@ -45,7 +45,7 @@ const openOrSwitchApplication = (applicationID) => {
           <div :class="getSelectedClasses(index, selectedIndex, active)">
             <i
               v-if="applications[item].icon"
-              class="icon"
+              class="icon-64"
               :class="applications[item].icon"
             ></i>
           </div>

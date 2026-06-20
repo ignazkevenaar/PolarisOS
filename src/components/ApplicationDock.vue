@@ -41,7 +41,7 @@ const openWindowsNotAlreadyInDock = computed(() => {
             :tooltip="applications[applicationID].name"
             @click="openOrSwitchApplication(applicationID)"
           >
-            <i class="icon" :class="applications[applicationID].icon"></i>
+            <i class="icon-64" :class="applications[applicationID].icon"></i>
           </DockButton>
         </div>
         <div v-if="openWindowsNotAlreadyInDock.length" class="container emboss">
@@ -53,7 +53,7 @@ const openWindowsNotAlreadyInDock = computed(() => {
             :tooltip="applications[applicationID].name"
             @click="openOrSwitchApplication(applicationID)"
           >
-            <i class="icon" :class="applications[applicationID].icon"></i>
+            <i class="icon-64" :class="applications[applicationID].icon"></i>
           </DockButton>
         </div>
       </div>

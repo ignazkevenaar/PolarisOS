@@ -1,3 +1,4 @@
+import BrowserApplication from "../components/applications/BrowserApplication.vue";
 import ContainerApplication from "../components/applications/ContainerApplication.vue";
 import TestApplication from "../components/applications/TestApplication.vue";
 import XEyesApplication from "../components/applications/XEyesApplication.vue";
@@ -26,5 +27,13 @@ export default {
     icon: "application",
     items: ["eyes", "test", "eyes", "test", "eyes", "test"],
     resizable: true,
+  },
+  browser: {
+    name: "Browser",
+    component: BrowserApplication,
+    icon: "browser",
+    resizable: true,
+    width: 800,
+    height: 600,
   },
 };

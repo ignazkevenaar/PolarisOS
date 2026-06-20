@@ -1,30 +1,50 @@
 @use "sass:list";
 @use "sass:math";
 
-$icons:
+$icons-64:
   clock, calendar, eyes, mailbox, browser, camera, trash, briefcase, finder,
   palette, cd, picture, eightball, model, ferrari, games, ignaz, rolodex,
   wrench, application;
 
-.icon {
-  $icon-size: 64px;
-  $icons-per-row: 4;
+$icons-16: back, forward, home, go, external, refresh, bookmark;
 
-  display: block;
-  width: $icon-size;
-  height: $icon-size;
-  background-image: url("img/icons-64.png");
-  zoom: 1;
-  image-rendering: pixelated;
-  filter: drop-shadow(3px 3px 0 rgb(0 0 0 / 0.2));
-
-  @for $i from 1 through list.length($icons) {
-    $icon: list.nth($icons, $i);
+@mixin unwrapIcons($list, $size, $icons-per-row) {
+  @for $i from 1 through list.length($list) {
+    $icon: list.nth($list, $i);
     $y: math.floor(math.div(($i - 1), $icons-per-row));
     $x: ($i - 1) % $icons-per-row;
 
     &.#{$icon} {
-      background-position: (-$x * $icon-size) (-$y * $icon-size);
+      background-position: (-$x * $size) (-$y * $size);
     }
   }
+}
+
+.icon-64,
+.icon-16 {
+  display: block;
+  image-rendering: pixelated;
+}
+
+.icon-64 {
+  $icon-size: 64px;
+  $icons-per-row: 4;
+
+  width: $icon-size;
+  height: $icon-size;
+  background-image: url("img/icons-64.png");
+  filter: drop-shadow(3px 3px 0 rgb(0 0 0 / 0.2));
+
+  @include unwrapIcons($icons-64, $icon-size, $icons-per-row);
+}
+
+.icon-16 {
+  $icon-size: 16px;
+  $icons-per-row: 4;
+
+  width: $icon-size;
+  height: $icon-size;
+  background-image: url("img/icons-16.png");
+
+  @include unwrapIcons($icons-16, $icon-size, $icons-per-row);
 }

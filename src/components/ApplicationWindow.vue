@@ -97,7 +97,7 @@ onMounted(() => {
           <span class="glyph bevel"></span>
         </button>
       </div>
-      <div class="content">
+      <div class="content" :class="{ 'color-surface': !transparent }">
         <slot :active></slot>
       </div>
     </div>
@@ -121,6 +121,10 @@ onMounted(() => {
       4px 4px 0px rgba(0 0 0 / 0.25);
   }
 
+  &.transparent {
+    background-color: transparent;
+  }
+
   &.active {
     &:not(.transparent) {
       box-shadow:
@@ -139,7 +143,6 @@ onMounted(() => {
   }
 
   .container {
-    background-color: rgb(var(--color-surface));
     text-rendering: geometricPrecision;
     box-sizing: border-box;
     height: 100%;

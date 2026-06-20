@@ -1,8 +1,9 @@
 <script setup>
-import { provide, useTemplateRef } from "vue";
+import { onMounted, provide, useTemplateRef } from "vue";
 import ApplicationDock from "./ApplicationDock.vue";
 import MinimizedWindow from "./MinimizedWindow.vue";
 import { useWindowManager } from "../composables/windowManager.js";
+import applications from "../config/applications.js";
 
 const desktopElement = useTemplateRef("desktop");
 provide("desktopElement", desktopElement);
@@ -10,6 +11,7 @@ provide("desktopElement", desktopElement);
 const {
   windows,
   windowOrder,
+  focusOrder,
   hiddenWindows,
   bringToFront,
   move,
@@ -17,7 +19,32 @@ const {
   close,
   hide,
   show,
+  registerOrSwitch,
 } = useWindowManager();
+
+onMounted(async () => {
+  if (window !== window.top) return;
+
+  const path = location.pathname;
+  if (path === "/") return;
+
+  const check = await fetch(`/web/${path.slice(1)}`, { method: "HEAD" });
+  if (!check.ok) {
+    window.history.replaceState({}, "", "/");
+    return;
+  }
+
+  const browserApplication = applications.browser;
+  registerOrSwitch(
+    "browser",
+    browserApplication.name,
+    browserApplication.component,
+    {
+      ...browserApplication,
+      initialURL: path.slice(1),
+    },
+  );
+});
 </script>
 
 <template>
@@ -33,11 +60,13 @@ const {
     </div>
     <Component
       :is="windows[windowID].component"
-      v-for="(windowID, windowIndex) in windowOrder"
+      v-for="windowID in windowOrder"
       v-show="!hiddenWindows.has(windowID)"
+      :window-i-d="windowID"
       v-bind="windows[windowID]"
       :key="windowID"
-      :active="windowIndex === windowOrder.length - 1"
+      :active="focusOrder[focusOrder.length - 1] === windowID"
+      :style="{ zIndex: focusOrder.indexOf(windowID) + 1 }"
       @focus="bringToFront(windowID)"
       @move="move(windowID, $event)"
       @resize="resize(windowID, $event)"
