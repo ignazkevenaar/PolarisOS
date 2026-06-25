@@ -32,7 +32,7 @@ $icons-16: back, forward, home, go, external, refresh, bookmark;
 
   width: $icon-size;
   height: $icon-size;
-  background-image: url("img/icons-64.png");
+  background-image: url("/img/icons-64.png");
   filter: drop-shadow(3px 3px 0 rgb(0 0 0 / 0.2));
 
   @include unwrapIcons($icons-64, $icon-size, $icons-per-row);
@@ -44,7 +44,7 @@ $icons-16: back, forward, home, go, external, refresh, bookmark;
 
   width: $icon-size;
   height: $icon-size;
-  background-image: url("img/icons-16.png");
+  background-image: url("/img/icons-16.png");
 
   @include unwrapIcons($icons-16, $icon-size, $icons-per-row);
 }

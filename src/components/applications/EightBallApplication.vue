@@ -110,7 +110,7 @@ const onDragEnd = () => {
 .triangle {
   width: 52px;
   height: 45px;
-  background-image: url(/img/applications/eight-ball/triangle.png);
+  background-image: url("/img/applications/eight-ball/triangle.png");
   position: absolute;
   top: 39px;
   left: 39px;

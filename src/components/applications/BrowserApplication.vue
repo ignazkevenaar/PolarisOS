@@ -28,10 +28,7 @@ const loadURL = (url) => {
 };
 
 const normalizeURL = (url) =>
-  url
-    .replace(/\/index\.html$/, "")
-    .replace(/\/index$/, "")
-    .replace(/\/$/, "") || url;
+  url.replace(/index\.html$/, "").replace(/index$/, "") || url;
 
 const onNavigate = (event) => {
   const contentWindow = event.target.contentWindow;

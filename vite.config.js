@@ -15,6 +15,8 @@ export default defineConfig({
         // check if they don't exist so the desktop is not loaded as a fallback.
         server.middlewares.use("/web", (req, res, next) => {
           const urlPath = req.url.split("?")[0];
+          const query = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
+
           const filePath = path.join(
             import.meta.dirname,
             "public/web",
@@ -26,15 +28,42 @@ export default defineConfig({
             return;
           }
 
-          if (fs.existsSync(filePath + ".html")) {
-            req.url = urlPath + ".html";
+          // File-type: <path>.html exists → canonical URL has no trailing slash
+          const pathWithoutSlash = urlPath.endsWith("/") ? urlPath.slice(0, -1) : urlPath;
+          const htmlFilePath = path.join(
+            import.meta.dirname,
+            "public/web",
+            pathWithoutSlash + ".html",
+          );
+
+          if (fs.existsSync(htmlFilePath)) {
+            if (urlPath.endsWith("/")) {
+              res.statusCode = 301;
+              res.setHeader("Location", "/web" + pathWithoutSlash + query);
+              res.end();
+              return;
+            }
+            req.url = pathWithoutSlash + ".html";
             next();
             return;
           }
 
-          const indexPath = path.join(filePath, "index.html");
+          // Directory-type: <path>/index.html exists → canonical URL has trailing slash
+          const indexPath = path.join(
+            import.meta.dirname,
+            "public/web",
+            pathWithoutSlash,
+            "index.html",
+          );
+
           if (fs.existsSync(indexPath)) {
-            req.url = (urlPath.endsWith("/") ? urlPath : urlPath + "/") + "index.html";
+            if (!urlPath.endsWith("/")) {
+              res.statusCode = 301;
+              res.setHeader("Location", "/web" + urlPath + "/" + query);
+              res.end();
+              return;
+            }
+            req.url = urlPath + "index.html";
             next();
             return;
           }
