@@ -219,6 +219,7 @@ onMounted(() => {
       place-items: center;
 
       .glyph {
+        --border-width: 1px;
         display: block;
         width: 12px;
         height: 2px;
@@ -229,6 +230,10 @@ onMounted(() => {
           height: 10px;
         }
       }
+    }
+
+    .transparent & {
+      --border-width: revert;
     }
   }
 
