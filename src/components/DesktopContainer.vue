@@ -148,8 +148,8 @@ const unfocusWindows = () => {
   z-index: 0;
   padding: var(--spacing);
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(5, 1fr);
+  grid-auto-columns: 86px;
+  grid-template-rows: repeat(auto-fit, 110px);
   gap: var(--spacing);
   grid-auto-flow: column;
   min-height: 0;
