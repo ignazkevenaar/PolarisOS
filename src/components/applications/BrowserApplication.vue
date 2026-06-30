@@ -1,5 +1,5 @@
 <script setup>
-import { ref, useTemplateRef, inject, watch } from "vue";
+import { ref, useTemplateRef, watch } from "vue";
 import ApplicationWindow from "../ApplicationWindow.vue";
 import { useWindowManager } from "../../composables/windowManager.js";
 import StyledInput from "../StyledInput.vue";
@@ -7,7 +7,9 @@ import bookmarks from "../../config/bookmarks.js";
 import IconButton from "../IconButton.vue";
 import bubbleIframePointerEvents from "../../utils/bubbleIframePointerEvents.js";
 import { injectStyles } from "../../config/injectStyles.js";
+import { useSettings } from "../../composables/settings.js";
 
+const { settings } = useSettings();
 const { changeTitle } = useWindowManager();
 
 const props = defineProps({
@@ -120,10 +122,7 @@ const clearHistory = () => {
   window.history.pushState({}, "", `/`);
 };
 
-const currentThemeID = inject("theme");
-const currentFontID = inject("font");
-
-watch([currentThemeID, currentFontID], () => {
+watch([() => settings.value.theme, () => settings.value.font], () => {
   console.log("watcher fires");
 
   injectStyles(

@@ -1,11 +1,10 @@
 <script setup>
-import { inject } from "vue";
 import fonts from "../../config/fonts.js";
 import ApplicationWindow from "../ApplicationWindow.vue";
 import IconButton from "../IconButton.vue";
+import { useSettings } from "../../composables/settings.js";
 
-const currentFontID = inject("font");
-const setFontID = inject("setFont");
+const { settings } = useSettings();
 </script>
 <template>
   <ApplicationWindow>
@@ -16,11 +15,11 @@ const setFontID = inject("setFont");
           v-for="(font, fontID) in fonts"
           :key="fontID"
           class="active bevel"
-          :class="{ 'color-tertiary': fontID === currentFontID }"
+          :class="{ 'color-tertiary': fontID === settings.font }"
         >
           <div class="emboss space">
             <div class="color-surface">
-              <IconButton :text="font.name" @click="setFontID(fontID)">
+              <IconButton :text="font.name" @click="settings.font = fontID">
                 <div class="fontPreview font" :class="`font-${fontID}`">
                   ABCDEFG abcdefg
                 </div>
@@ -31,13 +30,13 @@ const setFontID = inject("setFont");
       </div>
       <div class="attribution">
         <a
-          v-if="fonts[currentFontID].link"
-          :href="fonts[currentFontID].link"
+          v-if="fonts[settings.font].link"
+          :href="fonts[settings.font].link"
           target="_blank"
           >Source</a
         >
-        <p v-if="fonts[currentFontID].attribution">
-          {{ fonts[currentFontID].attribution }}
+        <p v-if="fonts[settings.font].attribution">
+          {{ fonts[settings.font].attribution }}
         </p>
       </div>
     </div>

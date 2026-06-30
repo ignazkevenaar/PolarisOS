@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted, provide, useTemplateRef } from "vue";
+import { onMounted, provide, useTemplateRef } from "vue";
 import ApplicationDock from "./ApplicationDock.vue";
 import MinimizedWindow from "./MinimizedWindow.vue";
 import { useWindowManager } from "../composables/windowManager.js";
 import applications from "../config/applications.js";
-import themes from "../config/themes.js";
-import fonts from "../config/fonts.js";
+import { useSettings } from "../composables/settings.js";
+
+const { settings } = useSettings();
 
 const desktopElement = useTemplateRef("desktop");
 provide("desktopElement", desktopElement);
@@ -23,20 +24,6 @@ const {
   show,
   registerOrSwitch,
 } = useWindowManager();
-
-const theme = ref(Object.keys(themes)[0]);
-const setTheme = (newTheme) => {
-  theme.value = newTheme;
-};
-provide("theme", theme);
-provide("setTheme", setTheme);
-
-const font = ref(Object.keys(fonts)[0]);
-const setFont = (newFont) => {
-  font.value = newFont;
-};
-provide("font", font);
-provide("setFont", setFont);
 
 const openBrowser = (URL) => {
   if (!URL) return;
@@ -81,7 +68,7 @@ const unfocusWindows = () => {
 <template>
   <div
     class="desktop theme font"
-    :class="[`theme-${theme}`, `font-${font}`]"
+    :class="[`theme-${settings.theme}`, `font-${settings.font}`]"
     ref="desktop"
   >
     <div class="clickable" @click="unfocusWindows" />

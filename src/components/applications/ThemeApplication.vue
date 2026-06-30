@@ -2,11 +2,10 @@
 import ApplicationWindow from "../ApplicationWindow.vue";
 import themes from "../../config/themes.js";
 import IconButton from "../IconButton.vue";
-import { inject } from "vue";
 import StyledInput from "../StyledInput.vue";
+import { useSettings } from "../../composables/settings.js";
 
-const currentThemeID = inject("theme");
-const setThemeID = inject("setTheme");
+const { settings } = useSettings();
 </script>
 <template>
   <ApplicationWindow>
@@ -19,11 +18,11 @@ const setThemeID = inject("setTheme");
           v-for="(theme, themeID) in themes"
           :key="themeID"
           class="active bevel"
-          :class="{ 'color-tertiary': themeID === currentThemeID }"
+          :class="{ 'color-tertiary': themeID === settings.theme }"
         >
           <div class="emboss space">
             <div class="color-surface">
-              <IconButton :text="theme.name" @click="setThemeID(themeID)">
+              <IconButton :text="theme.name" @click="settings.theme = themeID">
                 <div class="mockDesktop" :class="`theme-${themeID}`">
                   <div class="mockWindow bevel color-primary active">
                     <div class="emboss container">
@@ -53,13 +52,13 @@ const setThemeID = inject("setTheme");
       </div>
       <div class="attribution">
         <a
-          v-if="themes[currentThemeID].link"
-          :href="themes[currentThemeID].link"
+          v-if="themes[settings.theme].link"
+          :href="themes[settings.theme].link"
           target="_blank"
           >Source</a
         >
-        <p v-if="themes[currentThemeID].attribution">
-          {{ themes[currentThemeID].attribution }}
+        <p v-if="themes[settings.theme].attribution">
+          {{ themes[settings.theme].attribution }}
         </p>
       </div>
     </div>
