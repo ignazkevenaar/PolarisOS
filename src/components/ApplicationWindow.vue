@@ -28,6 +28,10 @@ const props = defineProps({
     type: [Number, String],
     default: "auto",
   },
+  center: {
+    type: Boolean,
+    default: false,
+  },
   zIndex: {
     type: Number,
     default: undefined,
@@ -47,6 +51,10 @@ const props = defineProps({
   transparent: {
     type: Boolean,
     default: false,
+  },
+  closable: {
+    type: Boolean,
+    default: true,
   },
   minimizable: {
     type: Boolean,
@@ -157,6 +165,15 @@ onMounted(() => {
     });
   }
 
+  if (props.center) {
+    const { width: wW, height: wH } =
+      windowElement.value.getBoundingClientRect();
+    const { width: dW, height: dH } =
+      desktopElement.value.getBoundingClientRect();
+
+    emit("dragMove", { x: (dW - wW) / 2, y: (dH - wH) / 2 });
+  }
+
   watch(
     () => [props.zIndex, props.active],
     ([newZ, newActive], oldValues) => {
@@ -205,7 +222,12 @@ const onMinimize = async () => {
     >
       <div class="container" :class="{ emboss: !transparent }">
         <div class="titleBar">
-          <button class="bevel interactive" title="Close" @click="onClose">
+          <button
+            v-if="closable"
+            class="bevel interactive"
+            title="Close"
+            @click="onClose"
+          >
             <span class="glyph bevel close"></span>
           </button>
           <div class="handle bevel text-shadow" ref="handle">
@@ -228,7 +250,7 @@ const onMinimize = async () => {
           :class="transparent ? [] : ['color-surface', 'bevel']"
           :style="contentStyles"
         >
-          <slot :active></slot>
+          <slot :active :close="onClose"></slot>
         </div>
       </div>
     </div>

@@ -29,11 +29,16 @@ button {
   flex-direction: column;
   align-items: center;
   font-family: inherit;
-  padding: 4px 8px;
+  padding: 4px 16px;
   font-size: 1em;
+  outline: 1px solid color-mix(in oklch, var(--local-color-dark), black 50%);
 
   &:disabled > * {
     opacity: 0.5;
+  }
+
+  &:enabled:active > * {
+    translate: 1px 1px;
   }
 }
 

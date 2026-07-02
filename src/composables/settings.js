@@ -31,6 +31,14 @@ const mergeDeep = (target, ...sources) => {
 const settings = ref(undefined);
 const storageKey = "polaris-settings";
 
+const tryWritingToLocalStorage = (contents) => {
+  try {
+    localStorage.setItem(storageKey, contents);
+  } catch (error) {
+    console.error("Error writing settings to localStorage", error);
+  }
+};
+
 export function useSettings() {
   if (settings.value === undefined) {
     try {
@@ -52,11 +60,7 @@ export function useSettings() {
         settings,
         (newSettings) => {
           const jsonString = JSON.stringify(newSettings);
-          try {
-            localStorage.setItem(storageKey, jsonString);
-          } catch (error) {
-            console.error("Error writing settings to localStorage", error);
-          }
+          tryWritingToLocalStorage(jsonString);
         },
         { deep: true },
       );
@@ -65,7 +69,16 @@ export function useSettings() {
     }
   }
 
+  const resetSettings = () => {
+    try {
+      localStorage.removeItem(storageKey);
+    } catch (error) {
+      console.error("Error clearing settings", error);
+    }
+  };
+
   return {
     settings,
+    resetSettings,
   };
 }

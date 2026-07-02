@@ -1,5 +1,6 @@
 import BrowserApplication from "../components/applications/BrowserApplication.vue";
 import ContainerApplication from "../components/applications/ContainerApplication.vue";
+import ShredderApplication from "../components/applications/ShredderApplication.vue";
 import EightBallApplication from "../components/applications/EightBallApplication.vue";
 import FontApplication from "../components/applications/FontApplication.vue";
 import TestApplication from "../components/applications/TestApplication.vue";
@@ -76,7 +77,7 @@ export default {
     width: 300,
     height: 200,
     resizable: true,
-    items: ["styleManager"],
+    items: ["styleManager", "shredder"],
   },
   trash: {
     name: "Trashcan",
@@ -111,5 +112,14 @@ export default {
     icon: {
       component: ClockIcon,
     },
+  },
+  shredder: {
+    name: "Shredder",
+    title: "Shredder",
+    component: ShredderApplication,
+    icon: "shredder",
+    closable: false,
+    minimizable: false,
+    center: true,
   },
 };
