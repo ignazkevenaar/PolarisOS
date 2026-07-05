@@ -9,6 +9,7 @@ import XEyesApplication from "../components/applications/XEyesApplication.vue";
 import ClockIcon from "../components/icons/ClockIcon.vue";
 import WallpaperApplication from "../components/applications/WallpaperApplication.vue";
 import InspectorApplication from "../components/applications/InspectorApplication.vue";
+import ClockApplication from "../components/applications/ClockApplication.vue";
 
 export default {
   test: {
@@ -119,10 +120,11 @@ export default {
   clock: {
     name: "Clock",
     title: "Clock",
-    component: TestApplication,
+    component: ClockApplication,
     icon: {
       component: ClockIcon,
     },
+    minimizable: false,
   },
   shredder: {
     name: "Shredder",
