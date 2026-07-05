@@ -5,7 +5,7 @@ import IconButton from "../IconButton.vue";
 import StyledInput from "../StyledInput.vue";
 import { useSettings } from "../../composables/settings.js";
 
-const { settings } = useSettings();
+const { settings, setSetting } = useSettings();
 </script>
 <template>
   <ApplicationWindow>
@@ -22,7 +22,10 @@ const { settings } = useSettings();
         >
           <div class="emboss space">
             <div class="color-surface">
-              <IconButton :text="theme.name" @click="settings.theme = themeID">
+              <IconButton
+                :text="theme.name"
+                @click="setSetting('theme', themeID)"
+              >
                 <div class="mockDesktop" :class="`theme-${themeID}`">
                   <div class="mockWindow bevel color-primary active">
                     <div class="emboss container">

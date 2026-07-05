@@ -7,6 +7,8 @@ import TestApplication from "../components/applications/TestApplication.vue";
 import ThemeApplication from "../components/applications/ThemeApplication.vue";
 import XEyesApplication from "../components/applications/XEyesApplication.vue";
 import ClockIcon from "../components/icons/ClockIcon.vue";
+import WallpaperApplication from "../components/applications/WallpaperApplication.vue";
+import InspectorApplication from "../components/applications/InspectorApplication.vue";
 
 export default {
   test: {
@@ -59,6 +61,15 @@ export default {
     width: 600,
     height: 400,
   },
+  wallpaper: {
+    name: "Wallpaper",
+    title: "Wallpaper",
+    component: WallpaperApplication,
+    icon: "wallpaper",
+    width: 545,
+    height: 400,
+    resizable: true,
+  },
   styleManager: {
     name: "Style Manager",
     title: "Style Manager",
@@ -67,7 +78,7 @@ export default {
     width: 300,
     height: 200,
     resizable: true,
-    items: ["theme", "font"],
+    items: ["theme", "wallpaper", "font"],
   },
   utilities: {
     name: "Utilities",
@@ -77,7 +88,7 @@ export default {
     width: 300,
     height: 200,
     resizable: true,
-    items: ["styleManager", "shredder"],
+    items: ["styleManager", "settingsInspector", "shredder"],
   },
   trash: {
     name: "Trashcan",
@@ -121,5 +132,14 @@ export default {
     closable: false,
     minimizable: false,
     center: true,
+  },
+  settingsInspector: {
+    name: "Inspector",
+    title: "Settings inspector",
+    component: InspectorApplication,
+    icon: "inspector",
+    resizable: true,
+    contentWidth: 640,
+    contentHeight: 480,
   },
 };

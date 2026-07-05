@@ -5,8 +5,10 @@ import MinimizedWindow from "./MinimizedWindow.vue";
 import { useWindowManager } from "../composables/windowManager.js";
 import applications from "../config/applications.js";
 import { useSettings } from "../composables/settings.js";
+import { useWallpaper } from "../composables/wallpaper.js";
 
 const { settings } = useSettings();
+const { wallpaperStyles } = useWallpaper();
 
 const desktopElement = useTemplateRef("desktop");
 provide("desktopElement", desktopElement);
@@ -69,6 +71,7 @@ const unfocusWindows = () => {
   <div
     class="desktop theme font"
     :class="[`theme-${settings.theme}`, `font-${settings.font}`]"
+    :style="wallpaperStyles"
     ref="desktop"
   >
     <div class="clickable" @click="unfocusWindows" />
@@ -114,7 +117,6 @@ const unfocusWindows = () => {
   display: grid;
   grid-template-rows: 1fr min-content;
   image-rendering: pixelated;
-  background: rgb(var(--color-desktop));
   font-weight: 400;
   font-style: normal;
   user-select: none;

@@ -4,7 +4,7 @@ import ApplicationWindow from "../ApplicationWindow.vue";
 import IconButton from "../IconButton.vue";
 import { useSettings } from "../../composables/settings.js";
 
-const { settings } = useSettings();
+const { settings, setSetting } = useSettings();
 </script>
 <template>
   <ApplicationWindow>
@@ -19,7 +19,7 @@ const { settings } = useSettings();
         >
           <div class="emboss space">
             <div class="color-surface">
-              <IconButton :text="font.name" @click="settings.font = fontID">
+              <IconButton :text="font.name" @click="setSetting('font', fontID)">
                 <div class="fontPreview font" :class="`font-${fontID}`">
                   ABCDEFG abcdefg
                 </div>

@@ -25,6 +25,7 @@ defineProps({
 
 <style lang="css" scoped>
 button {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;

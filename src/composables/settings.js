@@ -1,10 +1,11 @@
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import themes from "../config/themes.js";
 import fonts from "../config/fonts.js";
 
 const defaultSettings = {
   theme: Object.keys(themes)[0],
   font: Object.keys(fonts)[0],
+  wallpaperSize: "tile",
 };
 
 const isObject = (item) => {
@@ -55,19 +56,16 @@ export function useSettings() {
         console.error("No or invalid settings", error);
         settings.value = structuredClone(defaultSettings);
       }
-
-      watch(
-        settings,
-        (newSettings) => {
-          const jsonString = JSON.stringify(newSettings);
-          tryWritingToLocalStorage(jsonString);
-        },
-        { deep: true },
-      );
     } catch (error) {
       console.error("Error getting settings", error);
     }
   }
+
+  const setSetting = (key, value) => {
+    settings.value[key] = value;
+    const jsonString = JSON.stringify(settings.value);
+    tryWritingToLocalStorage(jsonString);
+  };
 
   const resetSettings = () => {
     try {
@@ -79,6 +77,7 @@ export function useSettings() {
 
   return {
     settings,
+    setSetting,
     resetSettings,
   };
 }
