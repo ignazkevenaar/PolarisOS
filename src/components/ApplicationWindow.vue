@@ -252,6 +252,7 @@ const onMinimize = async () => {
         >
           <slot :active :close="onClose"></slot>
         </div>
+        <slot name="content" :active :close="onClose"></slot>
       </div>
     </div>
 
@@ -406,6 +407,10 @@ const onMinimize = async () => {
     position: relative;
     flex: 1 1 auto;
     overflow: auto;
+
+    &:empty {
+      display: none;
+    }
   }
 }
 

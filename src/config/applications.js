@@ -10,6 +10,7 @@ import ClockIcon from "../components/icons/ClockIcon.vue";
 import WallpaperApplication from "../components/applications/WallpaperApplication.vue";
 import InspectorApplication from "../components/applications/InspectorApplication.vue";
 import ClockApplication from "../components/applications/ClockApplication.vue";
+import AboutApplication from "../components/applications/AboutApplication.vue";
 
 export default {
   test: {
@@ -86,10 +87,10 @@ export default {
     title: "Utilities",
     component: ContainerApplication,
     icon: "wrench",
-    width: 300,
-    height: 200,
+    width: 600,
+    height: 300,
     resizable: true,
-    items: ["styleManager", "settingsInspector", "shredder"],
+    items: ["styleManager", "settingsInspector", "shredder", "about"],
   },
   trash: {
     name: "Trashcan",
@@ -143,5 +144,14 @@ export default {
     resizable: true,
     contentWidth: 640,
     contentHeight: 480,
+  },
+  about: {
+    name: "About this System",
+    title: "About PolarisOS",
+    component: AboutApplication,
+    icon: "application",
+    contentWidth: 640,
+    contentHeight: 480,
+    minimizable: false,
   },
 };

@@ -65,6 +65,9 @@ onMounted(async () => {
 const unfocusWindows = () => {
   bringToFront("dock");
 };
+
+// eslint-disable-next-line no-undef
+const version = __APP_VERSION__;
 </script>
 
 <template>
@@ -74,6 +77,7 @@ const unfocusWindows = () => {
     :style="wallpaperStyles"
     ref="desktop"
   >
+    <p class="evaluation">Evaluation copy. Version {{ version }}</p>
     <div class="clickable" @click="unfocusWindows" />
     <div class="icons">
       <MinimizedWindow
@@ -149,5 +153,15 @@ const unfocusWindows = () => {
   > * {
     pointer-events: initial;
   }
+}
+
+.evaluation {
+  color: white;
+  margin: 4px;
+  position: absolute;
+  inset: 0;
+  text-align: right;
+  font-family: monospace;
+  text-shadow: 0 1px 0 black;
 }
 </style>

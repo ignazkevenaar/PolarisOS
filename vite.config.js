@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import fs from "fs";
 import path from "path";
+import process from "process";
 
 export default defineConfig({
   plugins: [
@@ -15,7 +16,9 @@ export default defineConfig({
         // check if they don't exist so the desktop is not loaded as a fallback.
         server.middlewares.use("/web", (req, res, next) => {
           const urlPath = req.url.split("?")[0];
-          const query = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
+          const query = req.url.includes("?")
+            ? req.url.slice(req.url.indexOf("?"))
+            : "";
 
           const filePath = path.join(
             import.meta.dirname,
@@ -29,7 +32,9 @@ export default defineConfig({
           }
 
           // File-type: <path>.html exists → canonical URL has no trailing slash
-          const pathWithoutSlash = urlPath.endsWith("/") ? urlPath.slice(0, -1) : urlPath;
+          const pathWithoutSlash = urlPath.endsWith("/")
+            ? urlPath.slice(0, -1)
+            : urlPath;
           const htmlFilePath = path.join(
             import.meta.dirname,
             "public/web",
@@ -79,4 +84,7 @@ export default defineConfig({
       },
     },
   ],
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+  },
 });
