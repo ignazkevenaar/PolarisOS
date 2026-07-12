@@ -1,0 +1,42 @@
+---
+export async function getStaticPaths() {
+  // Grab all files we consider “pages” inside the subfolder.
+  const modules = import.meta.glob('./web/**/*.{astro,md,mdx,html}', {
+    eager: false,
+  });
+
+  const subfolder = '/web/';
+
+  const outsidePaths = [];
+
+  for (const filePath of Object.keys(modules)) {
+    const normalized = filePath.replaceAll('\\', '/');
+
+    const idx = normalized.indexOf(subfolder);
+    if (idx === -1) continue;
+
+    let routePart = normalized.slice(idx + subfolder.length); // e.g. "foo/bar.md"
+    routePart = routePart.replace(/\.(astro|md|mdx|html)$/, '');
+
+    // Convert "index" conventions:
+    // - web/foo/index.md -> /foo
+    // - web/foo/index.astro -> /foo
+    if (routePart.endsWith('/index')) routePart = routePart.slice(0, -'/index'.length);
+
+    outsidePaths.push(routePart);
+  }
+
+  const uniquePaths = Array.from(new Set(outsidePaths));
+  return uniquePaths.map((path) => ({ params: { path } }));
+}
+
+const baseURL = import.meta.env.BASE_URL;
+const { path } = Astro.params;
+
+Astro.locals.outsidePath = path;
+
+return Astro.rewrite(baseURL);
+---
+
+<h1>Outside route</h1>
+<p>{baseURL}{path}</p>

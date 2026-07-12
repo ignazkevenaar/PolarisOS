@@ -117,7 +117,12 @@ const handleFileUpload = (event) => {
 
       <div class="spaceBetween">
         <div class="preview">
-          <div class="monitor">
+          <div
+            class="monitor"
+            :style="{
+              background: `url('${baseURL}/img/applications/wallpapers/monitor.png')`,
+            }"
+          >
             <div class="contents">
               <Transition>
                 <div
@@ -246,7 +251,6 @@ const handleFileUpload = (event) => {
     position: relative;
     width: 176px;
     height: 164px;
-    background: url("/img/applications/wallpapers/monitor.png");
     display: grid;
     place-items: center;
 

@@ -3,18 +3,19 @@ import LargeIcon from "../LargeIcon.vue";
 import { useAnalogClock } from "../../composables/analogClock.js";
 
 const { hourAngle, minuteAngle } = useAnalogClock();
+const baseURL = import.meta.env.BASE_URL;
 </script>
 
 <template>
   <LargeIcon icon="clock">
     <div class="face color-tertiary active">
       <img
-        src="/img/hand-hour.png"
+        :src="`${baseURL}/img/hand-hour.png`"
         class="hand hour"
         :style="{ rotate: `${hourAngle}deg` }"
       />
       <img
-        src="/img/hand-minute.png"
+        :src="`${baseURL}/img/hand-minute.png`"
         class="hand"
         :style="{ rotate: `${minuteAngle}deg` }"
       />

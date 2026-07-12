@@ -11,9 +11,9 @@ const baseURL = import.meta.env.BASE_URL;
 
 <template>
   <i
-    class="icon-64"
+    class="icon-16"
     :class="icon"
-    :style="{ backgroundImage: `url('${baseURL}/img/icons-64.png')` }"
+    :style="{ backgroundImage: `url('${baseURL}/img/icons-16.png')` }"
     ><slot
   /></i>
 </template>

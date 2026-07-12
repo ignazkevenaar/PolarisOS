@@ -3,6 +3,8 @@ import { ref, watch, toValue } from "vue";
 import ApplicationWindow from "../ApplicationWindow.vue";
 import eightBallResponses from "../../config/eightBallResponses.js";
 
+const baseURL = import.meta.env.BASE_URL;
+
 const response = ref("");
 
 const generateResponse = () => {
@@ -66,11 +68,21 @@ const onDragEnd = () => {
   >
     <div class="ball" @dblclick="generateResponse">
       <Transition name="fade" mode="out-in">
-        <div v-if="response" :key="response" class="triangle double">
+        <div
+          v-if="response"
+          :key="response"
+          class="triangle double"
+          :style="{
+            backgroundImage: `url('${baseURL}/img/applications/eight-ball/triangle.png')`,
+          }"
+        >
           <span>{{ response }}</span>
         </div>
       </Transition>
-      <img src="/img/applications/eight-ball/eight-ball.png" class="double" />
+      <img
+        :src="`${baseURL}/img/applications/eight-ball/eight-ball.png`"
+        class="double"
+      />
     </div>
   </ApplicationWindow>
 </template>
@@ -110,7 +122,6 @@ const onDragEnd = () => {
 .triangle {
   width: 52px;
   height: 45px;
-  background-image: url("/img/applications/eight-ball/triangle.png");
   position: absolute;
   top: 39px;
   left: 39px;

@@ -10,6 +10,13 @@ import { useWallpaper } from "../composables/wallpaper.js";
 const { settings } = useSettings();
 const { wallpaperStyles } = useWallpaper();
 
+const props = defineProps({
+  initialURL: {
+    type: String,
+    default: undefined,
+  },
+});
+
 const desktopElement = useTemplateRef("desktop");
 provide("desktopElement", desktopElement);
 
@@ -48,14 +55,14 @@ provide("openBrowser", openBrowser);
 onMounted(async () => {
   // Prevent recursive loading in <iframe>
   if (window !== window.top) return;
+  if (!props.initialURL) return;
 
   const baseURL = import.meta.env.BASE_URL;
   const homePath = `${baseURL}/`;
-  const path = location.pathname;
+  const path = props.initialURL;
   if (path === homePath || path === baseURL) return;
 
-  const relativeURL = path.slice(homePath.length);
-  const check = await fetch(`${baseURL}/web/${relativeURL}`, {
+  const check = await fetch(`${baseURL}/web/${path}`, {
     method: "HEAD",
   });
   if (!check.ok) {
@@ -64,7 +71,7 @@ onMounted(async () => {
     return;
   }
 
-  openBrowser(relativeURL);
+  openBrowser(path);
 });
 
 const unfocusWindows = () => {

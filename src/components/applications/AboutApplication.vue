@@ -8,13 +8,14 @@ const version = __APP_VERSION__;
 const currentYear = new Date().getFullYear();
 
 const openBrowser = inject("openBrowser");
+const baseURL = import.meta.env.BASE_URL;
 </script>
 <template>
   <ApplicationWindow>
     <template #content="{ active }">
       <div class="content">
         <img
-          src="/img/applications/about/splash.png"
+          :src="`${baseURL}/img/applications/about/splash.png`"
           alt="PolarisOS logo"
           class="splash"
           :class="{ dim: !active }"

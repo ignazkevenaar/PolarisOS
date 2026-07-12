@@ -1,5 +1,6 @@
 <script setup>
 import ApplicationWindow from "./ApplicationWindow.vue";
+import LargeIcon from "./LargeIcon.vue";
 
 defineProps({
   text: {
@@ -13,7 +14,7 @@ defineProps({
     <template #default="{ close }">
       <div class="container">
         <div class="content">
-          <i class="icon-64 warning" />
+          <LargeIcon icon="warning" />
           <p>{{ text }}</p>
         </div>
         <div class="toolbar">

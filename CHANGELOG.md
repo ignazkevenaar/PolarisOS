@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+_Rewrote project in Astro to better aid me in writing the pseudo web with templates and statically generated routes._
+
+### Added
+
+- Add "About me" page.
+- Add `lint` and `format` scripts.
+
+### Removed
+
+- Some garbage and test data...
+
+### Changed
+
+- Rewrite project in Astro.
+
 ## 0.2.1 - 2026-07-12
 
 ### Added

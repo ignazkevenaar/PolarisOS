@@ -1,5 +1,5 @@
 <script setup>
-import { ref, useTemplateRef, watch } from "vue";
+import { onMounted, ref, useTemplateRef, watch } from "vue";
 import ApplicationWindow from "../ApplicationWindow.vue";
 import { useWindowManager } from "../../composables/windowManager.js";
 import StyledInput from "../StyledInput.vue";
@@ -8,6 +8,7 @@ import IconButton from "../IconButton.vue";
 import bubbleIframePointerEvents from "../../utils/bubbleIframePointerEvents.js";
 import { injectStyles } from "../../config/injectStyles.js";
 import { useSettings } from "../../composables/settings.js";
+import SmallIcon from "../SmallIcon.vue";
 
 const { settings } = useSettings();
 const { changeTitle } = useWindowManager();
@@ -17,7 +18,7 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  initialURL: { type: String, default: "index" },
+  initialURL: { type: String, default: undefined },
 });
 
 const windowElement = useTemplateRef("window");
@@ -44,11 +45,17 @@ const loadURL = (url) => {
 const normalizeURL = (url) =>
   url.replace(/index\.html$/, "").replace(/index$/, "") || url;
 
+const handleMessage = (event) => {
+  console.log("Message!", event);
+};
+
 const onNavigate = (event) => {
   const contentWindow = event.target.contentWindow;
   frameContentWindow.value = contentWindow;
 
   let href;
+
+  contentWindow.addEventListener("message", handleMessage);
 
   try {
     href = contentWindow.location.href;
@@ -111,7 +118,7 @@ const navigateForward = () => {
 };
 
 const navigateHome = () => {
-  navigateTo("index");
+  navigateTo("about-polaris");
 };
 
 const openCurrentPageInNewWindow = () => {
@@ -134,6 +141,10 @@ watch([() => settings.value.theme, () => settings.value.font], () => {
     windowElement.value.$el,
     frameContentWindow.value.document.documentElement,
   );
+});
+
+onMounted(() => {
+  if (!props.initialURL) navigateHome();
 });
 </script>
 <template>
@@ -182,7 +193,7 @@ watch([() => settings.value.theme, () => settings.value.font], () => {
               v-for="(bookmark, bookmarkIndex) in bookmarks"
               :key="bookmarkIndex"
             >
-              <i class="icon-16 bookmark" />
+              <SmallIcon icon="bookmark" />
               <a v-if="!bookmark.target" @click="navigateTo(bookmark.href)">{{
                 bookmark.text
               }}</a>

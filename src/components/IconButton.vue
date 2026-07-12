@@ -1,4 +1,6 @@
 <script setup>
+import SmallIcon from "./SmallIcon.vue";
+
 defineProps({
   text: {
     type: String,
@@ -18,7 +20,7 @@ defineProps({
 <template>
   <button class="bevel interactive" :disabled>
     <slot></slot>
-    <i v-if="icon" class="icon-16" :class="icon" />
+    <SmallIcon v-if="icon" :icon />
     <span v-if="text">{{ text }}</span>
   </button>
 </template>
