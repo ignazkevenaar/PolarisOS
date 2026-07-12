@@ -7,6 +7,7 @@ import IconButton from "../IconButton.vue";
 import StyledSelect from "../StyledSelect.vue";
 import { useWallpaper } from "../../composables/wallpaper.js";
 
+const baseURL = import.meta.env.BASE_URL;
 const { settings, setSetting } = useSettings();
 const { wallpaperStyles, isCustomWallpaper } = useWallpaper();
 
@@ -107,7 +108,9 @@ const handleFileUpload = (event) => {
                 : []
             "
           >
-            <img :src="`/img/wallpapers/${wallpaper.url ?? wallpaper}`" />
+            <img
+              :src="`${baseURL}/img/wallpapers/${wallpaper.url ?? wallpaper}`"
+            />
           </IconButton>
         </div>
       </div>

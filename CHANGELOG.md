@@ -4,6 +4,7 @@
 
 ### Added
 
+- Add base URL support.
 - Add Github pages integration.
 
 ## 0.2.0 - 2026-07-12

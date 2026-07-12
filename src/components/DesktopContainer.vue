@@ -49,17 +49,22 @@ onMounted(async () => {
   // Prevent recursive loading in <iframe>
   if (window !== window.top) return;
 
+  const baseURL = import.meta.env.BASE_URL;
+  const homePath = `${baseURL}/`;
   const path = location.pathname;
-  if (path === "/") return;
+  if (path === homePath || path === baseURL) return;
 
-  const check = await fetch(`/web/${path.slice(1)}`, { method: "HEAD" });
+  const relativeURL = path.slice(homePath.length);
+  const check = await fetch(`${baseURL}/web/${relativeURL}`, {
+    method: "HEAD",
+  });
   if (!check.ok) {
     console.warn("Invalid URL", path, check);
-    window.history.replaceState({}, "", "/");
+    window.history.replaceState({}, "", homePath);
     return;
   }
 
-  openBrowser(path.slice(1));
+  openBrowser(relativeURL);
 });
 
 const unfocusWindows = () => {

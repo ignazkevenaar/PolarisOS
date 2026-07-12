@@ -22,7 +22,8 @@ const props = defineProps({
 
 const windowElement = useTemplateRef("window");
 
-const urlScope = "web/";
+const baseURL = import.meta.env.BASE_URL;
+const urlScope = `${baseURL}/web/`;
 const currentURL = ref(props.initialURL);
 const browserLocation = ref("");
 const iframeEl = ref(null);
@@ -37,7 +38,7 @@ let pendingNavForward = false;
 
 const loadURL = (url) => {
   currentURL.value = url;
-  iframeEl.value.src = `/${urlScope}${url}`;
+  iframeEl.value.src = `${urlScope}${url}`;
 };
 
 const normalizeURL = (url) =>
@@ -66,13 +67,17 @@ const onNavigate = (event) => {
   pendingNavBack = false;
   pendingNavForward = false;
 
-  const prefix = `${location.origin}/${urlScope}`;
+  const prefix = `${location.origin}${urlScope}`;
   const raw = href.startsWith(prefix) ? href.slice(prefix.length) : href;
   const normalizedURL = normalizeURL(raw);
 
   currentURL.value = normalizedURL;
 
-  window.history.replaceState({ url: normalizedURL }, "", `/${normalizedURL}`);
+  window.history.replaceState(
+    { url: normalizedURL },
+    "",
+    `${baseURL}/${normalizedURL}`,
+  );
   browserLocation.value = currentURL.value;
   changeTitle(props.windowID, `${contentWindow.document.title} — Browser`);
 
@@ -110,7 +115,7 @@ const navigateHome = () => {
 };
 
 const openCurrentPageInNewWindow = () => {
-  const url = "/" + urlScope + currentURL.value;
+  const url = urlScope + currentURL.value;
   window.open(url, "_blank").focus();
 };
 
@@ -119,7 +124,7 @@ const selectAll = (event) => {
 };
 
 const clearHistory = () => {
-  window.history.pushState({}, "", `/`);
+  window.history.pushState({}, "", `${baseURL}/`);
 };
 
 watch([() => settings.value.theme, () => settings.value.font], () => {
@@ -193,7 +198,7 @@ watch([() => settings.value.theme, () => settings.value.font], () => {
     <div class="container color-container emboss">
       <iframe
         ref="iframeEl"
-        :src="`/${urlScope}${props.initialURL}`"
+        :src="`${urlScope}${props.initialURL}`"
         @load="onNavigate"
       ></iframe>
     </div>

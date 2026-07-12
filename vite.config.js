@@ -4,8 +4,10 @@ import fs from "fs";
 import path from "path";
 import process from "process";
 
+const base = "/PolarisOS";
+
 export default defineConfig({
-  base: "PolarisOS",
+  base,
   plugins: [
     vue(),
     {
@@ -15,7 +17,7 @@ export default defineConfig({
         // which is nice for the "desktop", but we serve the internal
         // "internet" pages as actual static html pages. We need to actually
         // check if they don't exist so the desktop is not loaded as a fallback.
-        server.middlewares.use("/web", (req, res, next) => {
+        server.middlewares.use(base + "/web", (req, res, next) => {
           const urlPath = req.url.split("?")[0];
           const query = req.url.includes("?")
             ? req.url.slice(req.url.indexOf("?"))
@@ -45,7 +47,10 @@ export default defineConfig({
           if (fs.existsSync(htmlFilePath)) {
             if (urlPath.endsWith("/")) {
               res.statusCode = 301;
-              res.setHeader("Location", "/web" + pathWithoutSlash + query);
+              res.setHeader(
+                "Location",
+                base + "/web" + pathWithoutSlash + query,
+              );
               res.end();
               return;
             }
@@ -65,7 +70,7 @@ export default defineConfig({
           if (fs.existsSync(indexPath)) {
             if (!urlPath.endsWith("/")) {
               res.statusCode = 301;
-              res.setHeader("Location", "/web" + urlPath + "/" + query);
+              res.setHeader("Location", base + "/web" + urlPath + "/" + query);
               res.end();
               return;
             }

@@ -30,9 +30,10 @@ export function useWallpaper() {
       size = "cover";
     }
 
+    const baseURL = import.meta.env.BASE_URL;
     const url = isCustomWallpaper.value
       ? settings.value.wallpaper
-      : `/img/wallpapers/${settings.value.wallpaper}`;
+      : `${baseURL}/img/wallpapers/${settings.value.wallpaper}`;
 
     return {
       backgroundColor: "rgb(var(--color-desktop))",
