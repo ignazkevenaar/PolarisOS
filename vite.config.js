@@ -5,6 +5,7 @@ import path from "path";
 import process from "process";
 
 export default defineConfig({
+  base: "PolarisOS",
   plugins: [
     vue(),
     {
