@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - 2026-07-12
 
 _Second release. Added lots of features and developed system into a basic workable state with applications._
 
