@@ -77,7 +77,7 @@ export default {
     title: "Style Manager",
     component: ContainerApplication,
     icon: "palette",
-    width: 300,
+    width: 400,
     height: 200,
     resizable: true,
     items: ["theme", "wallpaper", "font"],
