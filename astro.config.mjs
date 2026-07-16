@@ -6,9 +6,13 @@ import vue from "@astrojs/vue";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://ignazkevenaar.github.io",
   base: "/PolarisOS",
   outDir: "./dist", // Default
   integrations: [vue()],
+  build: {
+    format: "preserve",
+  },
   vite: {
     define: {
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
