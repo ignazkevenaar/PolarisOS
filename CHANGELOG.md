@@ -15,6 +15,7 @@ _Rewrote project in Astro to better aid me in writing the pseudo web with templa
 
 ### Changed
 
+- Update dependencies.
 - Rewrite project in Astro.
 
 ## 0.2.1 - 2026-07-12
