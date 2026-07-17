@@ -1,0 +1,17 @@
+---
+import { getOutsideRouteParts } from "../_outsideRoutes.js";
+
+// Mirrors every index-shaped page under /web/** (e.g. web/foo/index.astro,
+// web/foo/index.html) at the root, producing foo/index.html — trailing slash.
+// Being literally named index.astro (inside the [...path] param folder) is
+// what makes Astro emit directory-shaped output here; see ../[...path].astro
+// for the flat counterpart.
+export async function getStaticPaths() {
+  const { indexed } = getOutsideRouteParts();
+  return indexed.map((path) => ({ params: { path: path || undefined } }));
+}
+
+const { path } = Astro.params;
+Astro.locals.outsidePath = (path ?? "") + "/";
+return Astro.rewrite(import.meta.env.BASE_URL);
+---

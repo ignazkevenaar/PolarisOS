@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Add 404 fallback routing
+
+### Changed
+
+- Improve fallback routing
+
 ## 0.3.0 - 2026-07-16
 
 _Rewrote project in Astro to better aid me in writing the pseudo web with templates and statically generated routes._

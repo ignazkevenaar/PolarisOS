@@ -13,7 +13,10 @@ const { wallpaperStyles } = useWallpaper();
 const props = defineProps({
   initialURL: {
     type: String,
-    default: undefined,
+    // 404.astro can't know the requested path at build time, so it stashes
+    // it on window.__outsidePath before this island hydrates.
+    default: () =>
+      typeof window !== "undefined" ? window.__outsidePath : undefined,
   },
 });
 
@@ -119,6 +122,19 @@ const version = __APP_VERSION__;
     <ApplicationDock :active="focusOrder.at(-1) === 'dock'" />
   </div>
 </template>
+
+<style>
+html,
+body {
+  background-color: black;
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+</style>
 
 <style lang="css" scoped>
 .desktop {

@@ -1,11 +1,26 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Page not found</title>
-  </head>
-  <body>
-    Page not found
-  </body>
-</html>
+---
+import Layout from "../layouts/Layout.astro";
+import "../assets/style.scss";
+import "../assets/icons.scss";
+import "../assets/themes.css";
+import "../assets/fonts.css";
+import DesktopContainer from "../components/DesktopContainer.vue";
+---
+
+<Layout>
+  <script define:vars={{ base: import.meta.env.BASE_URL }} is:inline>
+    // GitHub Pages serves this file for any unmatched path while keeping
+    // the original URL in the address bar, so the originally requested
+    // route can only be recovered client-side here, before the desktop
+    // island below hydrates and reads window.__outsidePath.
+    var pathname = window.location.pathname;
+    window.__outsidePath = (
+      pathname.startsWith(base) ? pathname.slice(base.length) : pathname
+    ).replace(/^\/+/, ""); // Remove leading slashes
+  </script>
+  <DesktopContainer client:only="vue" />
+</Layout>
+
+<script is:inline>
+  console.warn("Page not found:", window.__outsidePath);
+</script>

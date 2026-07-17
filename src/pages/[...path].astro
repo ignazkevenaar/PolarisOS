@@ -1,49 +1,16 @@
 ---
+import { getOutsideRouteParts } from "./_outsideRoutes.js";
+
+// Mirrors every flat-shaped page under /web/** (e.g. web/about-polaris.md)
+// at the root, producing a flat page.html — no trailing slash.
+// Index-shaped pages (web/foo/index.astro) are handled by
+// ./[...path]/index.astro instead, so they keep their folder/index.html shape.
 export async function getStaticPaths() {
-  // Grab all files we consider “pages” inside the subfolder.
-  const modules = import.meta.glob('./web/**/*.{astro,md,mdx,html}', {
-    eager: false,
-  });
-
-  const subfolder = '/web/';
-
-  const outsidePaths = [];
-
-  for (const filePath of Object.keys(modules)) {
-    const normalized = filePath.replaceAll('\\', '/');
-
-    const idx = normalized.indexOf(subfolder);
-    if (idx === -1) continue;
-
-    let routePart = normalized.slice(idx + subfolder.length); // e.g. "foo/bar.md"
-    routePart = routePart.replace(/\.(astro|md|mdx|html)$/, '');
-
-    // Keep "index" segments intact here (don't collapse "foo/index" -> "foo").
-    // With `build.format: "preserve"`, Astro only emits "<dir>/index.html"
-    // instead of a flat "<dir>.html" when the generated path's own basename
-    // is literally "index" — for a shared dynamic route like this one,
-    // `routeData.isIndex` is always false, so that literal segment is the
-    // only lever we have (see astro's core/build/common.js getOutFile).
-    // Root-level "web/index.*" is skipped since it would collide with the
-    // real src/pages/index.astro page.
-    if (routePart === 'index') continue;
-
-    outsidePaths.push(routePart);
-  }
-
-  const uniquePaths = Array.from(new Set(outsidePaths));
-  return uniquePaths.map((path) => ({ params: { path } }));
+  const { flat } = getOutsideRouteParts();
+  return flat.map((path) => ({ params: { path } }));
 }
 
-const baseURL = import.meta.env.BASE_URL;
 const { path } = Astro.params;
-
-// Strip the trailing "index" segment kept in getStaticPaths() above — it's
-// only there to make Astro build the right output file, not part of the
-// logical route the rest of the app should see.
-const outsidePath = path.replace(/(^|\/)index$/, '');
-
-Astro.locals.outsidePath = outsidePath;
-
-return Astro.rewrite(baseURL);
+Astro.locals.outsidePath = path;
+return Astro.rewrite(import.meta.env.BASE_URL);
 ---
