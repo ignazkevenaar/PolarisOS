@@ -42,8 +42,8 @@ const loadURL = (url) => {
   iframeEl.value.src = `${urlScope}${url}`;
 };
 
-const normalizeURL = (url) =>
-  url.replace(/index\.html$/, "").replace(/index$/, "") || url;
+const normalizeURL = (url) => url;
+// url.replace(/index\.html$/, "").replace(/index$/, "") || url;
 
 const handleMessage = (event) => {
   console.log("Message!", event);

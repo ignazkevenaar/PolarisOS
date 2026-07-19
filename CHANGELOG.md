@@ -5,6 +5,7 @@
 ### Added
 
 - Add 404 fallback routing
+- Add about page
 
 ### Changed
 

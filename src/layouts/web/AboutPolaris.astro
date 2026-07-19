@@ -1,0 +1,108 @@
+---
+const { frontmatter, headings } = Astro.props;
+import Layout from "../Layout.astro";
+import Footer from "../../components/web/footer.astro";
+import "../../assets/web/fonts.css";
+import "../../assets/web/teleport.css";
+---
+
+<Layout {frontmatter}>
+  <header class="hero">
+    <img src="img/minisplash-logo.png" alt="PolarisOS" />
+    <img src="img/minisplash-right.png" alt="" aria-hidden="true" />
+  </header>
+
+  <nav>
+    <ul>
+      On this page:
+      {
+        headings
+          .filter((heading) => heading.depth > 1 && heading.depth < 4)
+          .map((heading) => (
+            <li class={`depth-${heading.depth}`}>
+              <a href={"#" + heading.slug}>
+                <img src="img/bullet.png" alt="" />
+                {heading.text}
+              </a>
+            </li>
+          ))
+      }
+    </ul>
+  </nav>
+
+  <article class="md">
+    <slot />
+    <Footer />
+  </article>
+</Layout>
+
+<style>
+  :root {
+    --header-height: 64px;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    display: grid;
+
+    grid-template-areas:
+      "header header"
+      "nav article"
+      "footer footer";
+  }
+
+  header {
+    grid-area: header;
+    height: var(--header-height);
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  nav {
+    grid-area: nav;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height) - 32px);
+    padding: 16px;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        &.depth-3 {
+          padding-inline-start: 8px;
+        }
+
+        img {
+          margin-inline-end: 8px;
+        }
+      }
+    }
+  }
+
+  article {
+    grid-area: article;
+    overflow: auto;
+    padding: 16px;
+    scroll-padding-block: 16px;
+
+    h1 {
+      margin-top: 0;
+    }
+  }
+</style>
+
+<style is:global>
+  .md {
+    p.opening {
+      font-size: 1.25em;
+    }
+  }
+</style>

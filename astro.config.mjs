@@ -13,6 +13,7 @@ export default defineConfig({
   build: {
     format: "preserve",
   },
+  compressHTML: true,
   vite: {
     define: {
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
