@@ -1,0 +1,197 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Block from "./_block.astro";
+import LargeIcon from "../../../components/web/LargeIcon.astro";
+---
+
+<Layout>
+  <div class="layout">
+    <header class="hero">Some social media site!</header>
+    <div>
+      <Block>
+        <h2 slot="header">About Ignaz</h2>
+        Hi! I'm Ignaz, an Interaction Designer and Frontend Developer from the Netherlands.
+      </Block>
+      <div class="columns">
+        <Block>
+          <h2 slot="header">Hobbies</h2>
+          <ul>
+            <li>Model building</li>
+            <li>Programming</li>
+            <li>Photography</li>
+            <li>Doodling up designs I don't have time for to build</li>
+          </ul>
+        </Block>
+        <Block class="block">
+          <h2 slot="header">Interests</h2>
+          <ul>
+            <li>(Japanese) cars</li>
+            <li>User interfaces</li>
+            <li>Unusual displays</li>
+            <li>Clocks</li>
+            <li>Cats</li>
+            <li>Hyperurbanism</li>
+            <li>Keyboards</li>
+          </ul>
+        </Block>
+      </div>
+      <Block>
+        <div class="tips">
+          <LargeIcon icon="tips" />
+          <div>
+            <h2>Did you know...</h2>
+            <p class="fact">
+              You've disabled JavaScript, how are you even able to use this
+              site!?
+            </p>
+          </div>
+        </div>
+      </Block>
+    </div>
+
+    <div>
+      <Block className="profile">
+        <h2 slot="header">Profile picture</h2>
+        <LargeIcon icon="ignaz" class="large" />
+      </Block>
+      <Block>
+        <h2 slot="header">My Profile</h2>
+        <table>
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>Ignaz</td>
+            </tr>
+            <tr>
+              <td>Age</td>
+              <td class="age"></td>
+            </tr>
+            <tr>
+              <td>From</td>
+              <td>The Netherlands 🇳🇱</td>
+            </tr>
+            <tr>
+              <td>Job</td>
+              <td>Interaction designer working as a Frontend Developer.</td>
+            </tr>
+            <tr>
+              <td>Cats</td>
+              <td>Two tomcats: Jelle & Thijs</td>
+            </tr>
+          </tbody>
+        </table>
+      </Block>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const aboutAge = new Date().getFullYear() - 1994;
+      const ageElement = document.querySelector(".age");
+      if (ageElement) ageElement.textContent = "≈ " + aboutAge.toString();
+
+      const factElement = document.querySelector(".fact");
+      if (factElement) {
+        const facts = [
+          "I Don't like cold food",
+          "I used to be able to recognize cars by just the shape of their tail lights",
+          "As a child I was scared of poppies because I thought they were going to pop!",
+          "I'm left handed (9% of minecraft skeletons are too!)",
+          "I love LEDs!",
+          "I love transparent elecronics",
+          "I'm named after a friend of my parents because they couldn't think of a name.",
+          "I speak Dutch and English and can understand a bit of German.",
+          "I peel my mandarins until there is no white stuff left.",
+          "I used to have a beach themed bedroom. My mom made me a lifesaver-shaped pillow which I cherised for years.",
+        ];
+        factElement.textContent =
+          facts.at(Math.floor(Math.random() * facts.length)) || "";
+      }
+    });
+  </script>
+</Layout>
+
+<style is:global>
+  :root {
+    --spacing: 8px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    grid-template-rows: auto auto;
+    padding: 8px;
+  }
+
+  .hero {
+    padding: 16px;
+    grid-column: 1 / span 2;
+    background-color: whitesmoke;
+    margin: calc(var(--spacing) / 2);
+  }
+
+  .tips {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+
+    i {
+      flex: 0 0 auto;
+    }
+
+    h2 {
+      font-size: 1.5em;
+    }
+
+    h2,
+    p {
+      margin: 0;
+    }
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+  }
+
+  td {
+    border: 1px solid black;
+  }
+
+  table {
+    td {
+      padding: 2px;
+      vertical-align: baseline;
+
+      &:first-child {
+        text-align: right;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  ul {
+    margin-block: 0;
+    padding-inline-start: 24px;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .profile {
+    i.large {
+      zoom: 2;
+    }
+  }
+</style>

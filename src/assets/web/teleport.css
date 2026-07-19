@@ -4,8 +4,8 @@ html {
   scrollbar-color: rgb(var(--color-tertiary-active))
     rgb(var(--color-surface-active));
 
-  ::selection {
+  /* ::selection {
     background-color: rgb(var(--color-tertiary-active));
     color: contrast-color(rgb(var(--color-tertiary-active)));
-  }
+  } */
 }

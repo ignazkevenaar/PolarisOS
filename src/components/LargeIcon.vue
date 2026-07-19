@@ -1,4 +1,6 @@
 <script setup>
+import "../assets/icons.scss";
+
 defineProps({
   icon: {
     type: String,
