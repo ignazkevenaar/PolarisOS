@@ -1,8 +1,8 @@
 ---
-const { class: className } = Astro.props;
+const { class: className, color } = Astro.props;
 ---
 
-<div class="block" class:list={className}>
+<div class="block" class:list={className} style={color ? `--color: ${color};`: undefined}>
   <div class="header"><slot name="header" /></div>
   <div class="content">
     <slot />
@@ -12,7 +12,8 @@ const { class: className } = Astro.props;
 <style>
   .block {
     --color: 128 200 255;
-    border: 1px solid black;
+
+    border: 4px ridge color-mix(in oklab, rgb(var(--color)) 80%, black);
     box-shadow: 4px 4px 0 rgb(0 0 0 / 0.15);
     background-color: white;
     margin: calc(var(--spacing, 8px) / 2);
@@ -25,6 +26,7 @@ const { class: className } = Astro.props;
     .header {
       background-color: rgb(var(--color));
       color: contrast-color(rgb(var(--color)));
+      border-bottom: 1px solid color-mix(in oklab, rgb(var(--color)) 80%, black);
 
       &:empty {
         display: none;

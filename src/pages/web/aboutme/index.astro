@@ -11,9 +11,11 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
       <Block>
         <h2 slot="header">About Ignaz</h2>
         Hi! I'm Ignaz, an Interaction Designer and Frontend Developer from the Netherlands.
+        I was around when the web looked like this and wanted to pay hommage to the
+        user interfaces of yesteryear.
       </Block>
       <div class="columns">
-        <Block>
+        <Block color="255 225 128">
           <h2 slot="header">Hobbies</h2>
           <ul>
             <li>Model building</li>
@@ -50,9 +52,11 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
     </div>
 
     <div>
-      <Block className="profile">
+      <Block>
         <h2 slot="header">Profile picture</h2>
-        <LargeIcon icon="ignaz" class="large" />
+        <div class="profile">
+          <LargeIcon icon="ignaz" class="large" />
+        </div>
       </Block>
       <Block>
         <h2 slot="header">My Profile</h2>
@@ -71,12 +75,12 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
               <td>The Netherlands 🇳🇱</td>
             </tr>
             <tr>
-              <td>Job</td>
+              <td>Occupation</td>
               <td>Interaction designer working as a Frontend Developer.</td>
             </tr>
             <tr>
-              <td>Cats</td>
-              <td>Two tomcats: Jelle & Thijs</td>
+              <td>Pets</td>
+              <td>Two cats: Jelle & Thijs</td>
             </tr>
           </tbody>
         </table>
@@ -117,10 +121,14 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
   }
 
   .layout {
+    overflow: visible;
+    height: 100%;
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 3fr 2fr;
     grid-template-rows: auto auto;
     padding: 8px;
+    background-image: url("/img/wallpapers/sora5.gif");
   }
 
   .hero {
@@ -151,6 +159,10 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
 
   h1 {
     text-align: center;
+  }
+
+  h2 {
+    font-size: 1rem;
   }
 
   h1,
@@ -190,8 +202,13 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
   }
 
   .profile {
+    padding: 16px;
+    background: black url("/web/aboutme/stars3.gif");
+    margin: -4px;
+
     i.large {
       zoom: 2;
+      margin: auto;
     }
   }
 </style>
