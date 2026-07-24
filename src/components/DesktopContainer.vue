@@ -103,6 +103,7 @@ const version = __APP_VERSION__;
         :icon="windows[windowID].icon"
       />
     </div>
+
     <Component
       :is="windows[windowID].component"
       v-for="windowID in windowOrder"

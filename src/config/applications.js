@@ -1,4 +1,4 @@
-import BrowserApplication from "../components/applications/BrowserApplication.vue";
+// import BrowserApplication from "../components/applications/BrowserApplication.vue";
 import ContainerApplication from "../components/applications/ContainerApplication.vue";
 import ShredderApplication from "../components/applications/ShredderApplication.vue";
 import EightBallApplication from "../components/applications/EightBallApplication.vue";
@@ -11,6 +11,7 @@ import WallpaperApplication from "../components/applications/WallpaperApplicatio
 import InspectorApplication from "../components/applications/InspectorApplication.vue";
 import ClockApplication from "../components/applications/ClockApplication.vue";
 import AboutApplication from "../components/applications/AboutApplication.vue";
+import { defineAsyncComponent } from "vue";
 
 export default {
   test: {
@@ -31,7 +32,10 @@ export default {
   },
   browser: {
     name: "Browser",
-    component: BrowserApplication,
+    component: defineAsyncComponent(async () => {
+      // await new Promise((resolve) => setTimeout(resolve, 5000));
+      return import("../components/applications/BrowserApplication.vue");
+    }),
     icon: "browser",
     resizable: true,
     width: 800,

@@ -1,0 +1,494 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import NeedForSpeedOne from "../../../assets/web/aboutme/games/nfs1.svg?url";
+import NeedForSpeedTwo from "../../../assets/web/aboutme/games/nfs2.svg?url";
+import NeedForSpeedThree from "../../../assets/web/aboutme/games/nfs3.svg?url";
+import NeedForSpeedFour from "../../../assets/web/aboutme/games/nfs4.svg?url";
+import BallLetter from "../../../components/web/aboutme/BallLetter.vue";
+import Footer from "../../../components/web/footer.astro";
+
+const baseURL = import.meta.env.BASE_URL;
+
+import categoriesWithGames from "./games.js";
+const categories = Object.entries(categoriesWithGames).map(
+  ([hash, { title }]) => [hash, title],
+);
+---
+
+<Layout base={baseURL}>
+  <div class="side" style={`--mask: url("${NeedForSpeedThree}")`}>
+    <div class="gradient zjoink">
+      <div class="stripes"></div>
+    </div>
+  </div>
+
+  <div class="header" style={`--mask: url("${NeedForSpeedTwo}")`}>
+    <div class="graphic"><div class="graphic"></div></div>
+
+    <div class="triangle zjoink" style={`--mask: url("${NeedForSpeedOne}")`}>
+      <div class="stripes"></div>
+      <div class="shadow"></div>
+    </div>
+    <div class="circle">
+      <div class="star"></div>
+      <div class="ball"></div>
+      <BallLetter client:only="vue" />
+    </div>
+    <h1>My Favorite Games</h1>
+  </div>
+
+  <div class="content">
+    <nav style={`--mask: url("${NeedForSpeedFour}")`}>
+      <div class="graphic"></div>
+      <ul>
+        {
+          categories.map(([categoryHash, categoryTitle]) => (
+            <li>
+              <a href={`${baseURL}/web/aboutme/games#${categoryHash}`}>
+                <span class="inside">
+                  <span class="reverseSkew">{categoryTitle}...</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="grid">
+      {
+        Object.entries(categoriesWithGames).map(([categoryKey, category]) => (
+          <div class="category" id={categoryKey}>
+            <h2>{category.title}</h2>
+            <div class="games">
+              {category.games.map((game) => (
+                <div class="game">
+                  <img
+                    src={`${baseURL}/web/aboutme/games/${game.image}`}
+                    alt={game.title}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+
+      <Footer>
+        The layout and graphics of this page are inspired by the menu of Need
+        for Speed III: Hot Pursuit.
+      </Footer>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
+</style>
+
+<style>
+  :root {
+    --header-height: 148px;
+  }
+
+  body {
+    background-image: url("/web/aboutme/games/background.png");
+    background-attachment: fixed;
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--header-height);
+    color: white;
+    font-style: italic;
+    font-family: "Audiowide", sans-serif;
+  }
+
+  svg {
+    position: fixed;
+    pointer-events: none;
+  }
+
+  .side {
+    position: fixed;
+    mask-image: var(--mask);
+    mask-size: 100% 100%;
+    inset-block-start: 20vh;
+    inset-inline-end: 0;
+    width: 150px;
+    height: 80vh;
+    pointer-events: none;
+
+    .gradient {
+      position: absolute;
+      mask-image: linear-gradient(to bottom, transparent, black, transparent);
+      inset: 0;
+      background-color: palegreen;
+    }
+
+    .zjoink {
+      animation-delay: -2.5s;
+    }
+  }
+
+  .stripes {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      black,
+      black 8px,
+      transparent 8px,
+      transparent 11px,
+      black 11px,
+      black 14px,
+      transparent 14px,
+      transparent 17px
+    );
+  }
+
+  @keyframes zjoink {
+    from {
+      background-position: 0 0;
+    }
+    15% {
+      background-position: 0 120%;
+    }
+    100% {
+      background-position: 0 120%;
+    }
+  }
+
+  .zjoink {
+    animation: zjoink 5s infinite;
+    background: linear-gradient(
+      to bottom,
+      rgb(93 125 175),
+      rgb(93 125 175) 46%,
+      white,
+      rgb(93 125 175) 54%,
+      rgb(93 125 175)
+    );
+    background-size: 100% 200%;
+  }
+
+  .triangle {
+    position: fixed;
+    z-index: 50;
+    mask-image: var(--mask);
+    mask-size: 100% 100%;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    width: 240px;
+    height: 240px;
+    pointer-events: none;
+
+    .shadow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        150% 150% at 75% 75%,
+        rgb(0 0 0 / 90%) 45%,
+        transparent 60%
+      );
+    }
+  }
+
+  @keyframes star {
+    0% {
+      rotate: 0deg;
+      scale: 1;
+    }
+    5% {
+      scale: 3;
+    }
+
+    15%,
+    to {
+      rotate: 90deg;
+      scale: 0;
+    }
+  }
+
+  @keyframes sweep {
+    0% {
+      background-position-x: 50%;
+    }
+
+    20% {
+      background-position-x: 200%;
+    }
+
+    100% {
+      background-position-x: 200%;
+    }
+  }
+
+  div.header {
+    display: flex;
+    position: sticky;
+    top: 0;
+    align-items: start;
+    gap: 16px;
+    z-index: 50;
+    box-sizing: border-box;
+    inset-inline-start: 16px;
+    padding: 16px;
+    padding-inline-start: 48px;
+    height: var(--header-height);
+    text-transform: uppercase;
+
+    .graphic {
+      --height: 200px;
+      position: absolute;
+      mask-image: var(--mask);
+      mask-size: 100% 100%;
+      animation: sweep 5s infinite linear;
+      animation-delay: 3s;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        darkgoldenrod 90%,
+        white 95%,
+        darkgoldenrod
+      );
+      background-size: 200%;
+      height: var(--height);
+      pointer-events: none;
+
+      .graphic {
+        animation: none;
+        background: url("/web/aboutme/games/clouds.png");
+        height: calc(var(--height) - 8px);
+      }
+    }
+
+    .circle,
+    h1 {
+      z-index: 100;
+    }
+
+    .circle {
+      display: grid;
+      position: relative;
+      flex: 0 0 auto;
+      place-items: center;
+      outline: 8px solid rgb(93 125 175);
+      border: 5px solid black;
+      border-radius: 100%;
+      width: 100px;
+      height: 100px;
+      pointer-events: none;
+      font-weight: 900;
+      font-size: 100px;
+      line-height: 0;
+      user-select: none;
+
+      .star,
+      .ball {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+      }
+
+      .star {
+        scale: 2.5;
+        animation: star 5s infinite linear;
+        animation-delay: -1.25s;
+        background-image: url("/web/aboutme/games/star.png");
+      }
+
+      .ball {
+        border-radius: 100%;
+        background-image: url("/web/aboutme/games/ball.png");
+      }
+    }
+
+    h1 {
+      position: relative;
+      margin: 0;
+      inset-block-start: 15px;
+      inset-inline-start: -15px;
+      background: linear-gradient(to bottom, khaki, darkgoldenrod);
+      -webkit-background-clip: text;
+      font-style: italic;
+      font-weight: 800;
+      font-size: 2.25em;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(6px 6px 2px black);
+      background-clip: text;
+      padding-inline-end: 0.5em; /* Fixes gradient with italic text */
+    }
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+
+    .grid {
+      grid-column-start: 2;
+    }
+  }
+
+  nav {
+    --color-default: 113 116 171;
+    --color-highlight: 239 236 88;
+    position: fixed;
+    z-index: 40;
+
+    mask-image: var(--mask);
+    mask-size: 100% 100%;
+    inset-block: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--color-default)) 75%,
+      transparent
+    );
+    width: 300px;
+    min-height: 480px;
+    font-style: normal;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+
+    ul {
+      position: absolute;
+      top: var(--header-height);
+      z-index: 40;
+      margin: 0;
+      padding-inline-start: 8px;
+      padding-inline-end: 0;
+      padding-block: 16px;
+      width: 100%;
+      list-style-type: none;
+      text-align: end;
+
+      li {
+        --m: 10px;
+        --skew-angle: 15deg;
+        display: flex;
+
+        position: relative;
+        justify-content: stretch;
+        transform: skew(calc(-1 * var(--skew-angle)));
+        margin-bottom: 8px;
+        width: 55%;
+
+        &:nth-child(1) {
+          margin-inline-start: calc(var(--m) * 0.4);
+        }
+        &:nth-child(2) {
+          margin-inline-start: calc(var(--m) * 0.1);
+        }
+        &:nth-child(3) {
+          margin-inline-start: calc(var(--m) * 0);
+        }
+        &:nth-child(4) {
+          margin-inline-start: calc(var(--m) * 0.6);
+        }
+        &:nth-child(5) {
+          margin-inline-start: calc(var(--m) * 1.5);
+        }
+
+        a {
+          flex: 1;
+          border-start-start-radius: 30px;
+          border-end-start-radius: 30px;
+          background-color: rgb(var(--color-default));
+          padding: 2px 16px;
+          padding-inline-end: 25%;
+          text-align: start;
+          text-decoration: none;
+
+          &:hover {
+            position: relative;
+            background: linear-gradient(
+              to right,
+              rgb(var(--color-highlight)),
+              rgb(var(--color-default)) 50%
+            );
+
+            &::after {
+              display: block;
+              position: absolute;
+              z-index: -1;
+              filter: blur(10px);
+              inset: -5px;
+              inset-inline-end: 0;
+              border-start-start-radius: 50px;
+              border-end-start-radius: 50px;
+              background: linear-gradient(
+                to right,
+                rgb(var(--color-highlight)),
+                transparent
+              );
+              width: 40%;
+              content: "";
+            }
+
+            .inside {
+              color: rgb(var(--color-highlight));
+            }
+          }
+
+          .inside {
+            display: block;
+            box-shadow: inset 6px 6px 6px rgb(var(--color-default) / 50%);
+            border-radius: 5px;
+            background-color: rgb(15 0 63);
+            padding: 3px 8px;
+            color: rgb(var(--color-default));
+
+            .reverseSkew {
+              display: block;
+              transform: skew(var(--skew-angle));
+            }
+          }
+        }
+      }
+    }
+
+    .graphic {
+      position: absolute;
+      mask-image: var(--mask);
+      mask-size: 100% 100%;
+      inset-block: 0;
+      background: black url("/web/aboutme/games/clouds.png");
+      width: calc(100% - 6px);
+    }
+  }
+
+  .grid {
+    flex: 1;
+    z-index: 30;
+
+    .category {
+      h2 {
+        margin-top: 0;
+        padding-inline: 32px;
+        text-shadow: 3px 3px 5px rgb(0 0 0 / 50%);
+      }
+
+      .games {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+        gap: 24px;
+        padding: 32px;
+        padding-block-start: 0;
+      }
+    }
+  }
+
+  .game {
+    width: 100%;
+
+    img {
+      filter: drop-shadow(10px 10px 20px black);
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+</style>
+
+<style>
+  .grid :global(footer) {
+    padding-inline-start: 72px;
+    padding-block-end: 16px;
+  }
+</style>

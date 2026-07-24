@@ -121,27 +121,27 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
   }
 
   .layout {
-    overflow: visible;
-    height: 100%;
-    box-sizing: border-box;
     display: grid;
-    grid-template-columns: 3fr 2fr;
     grid-template-rows: auto auto;
-    padding: 8px;
+    grid-template-columns: 3fr 2fr;
+    box-sizing: border-box;
     background-image: url("/img/wallpapers/sora5.gif");
+    padding: 8px;
+    height: 100%;
+    overflow: visible;
   }
 
   .hero {
-    padding: 16px;
     grid-column: 1 / span 2;
-    background-color: whitesmoke;
     margin: calc(var(--spacing) / 2);
+    background-color: whitesmoke;
+    padding: 16px;
   }
 
   .tips {
     display: flex;
-    gap: 16px;
     align-items: center;
+    gap: 16px;
 
     i {
       flex: 0 0 auto;
@@ -180,12 +180,12 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
 
   table {
     td {
-      padding: 2px;
       vertical-align: baseline;
+      padding: 2px;
 
       &:first-child {
-        text-align: right;
         font-weight: 600;
+        text-align: right;
         white-space: nowrap;
       }
     }
@@ -202,9 +202,9 @@ import LargeIcon from "../../../components/web/LargeIcon.astro";
   }
 
   .profile {
-    padding: 16px;
-    background: black url("/web/aboutme/stars3.gif");
     margin: -4px;
+    background: black url("/web/aboutme/stars3.gif");
+    padding: 16px;
 
     i.large {
       zoom: 2;

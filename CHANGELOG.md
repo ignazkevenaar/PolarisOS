@@ -6,6 +6,7 @@
 
 - Add 404 fallback routing
 - Add about page
+- Add games page.
 
 ### Changed
 
