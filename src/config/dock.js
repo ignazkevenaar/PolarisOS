@@ -1,7 +1,7 @@
 export default [
   {
     type: "container",
-    items: ["browser", "utilities"],
+    items: ["explorer", "memoryGame", "browser", "utilities"],
   },
   {
     type: "container",

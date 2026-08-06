@@ -15,6 +15,8 @@ const iconProps = computed(() => {
 });
 </script>
 <template>
-  <LargeIcon v-if="typeof icon === 'string'" :icon />
-  <Component v-else :is="icon.component" v-bind="iconProps"></Component>
+  <template v-if="icon">
+    <LargeIcon v-if="typeof icon === 'string'" :icon />
+    <Component v-else :is="icon.component" v-bind="iconProps"></Component>
+  </template>
 </template>

@@ -12,6 +12,7 @@ import InspectorApplication from "../components/applications/InspectorApplicatio
 import ClockApplication from "../components/applications/ClockApplication.vue";
 import AboutApplication from "../components/applications/AboutApplication.vue";
 import { defineAsyncComponent } from "vue";
+import MemoryGameApplication from "../components/applications/MemoryGameApplication.vue";
 
 export default {
   test: {
@@ -157,5 +158,23 @@ export default {
     contentWidth: 640,
     contentHeight: 480,
     minimizable: false,
+  },
+  explorer: {
+    name: "File explorer",
+    component: defineAsyncComponent(async () => {
+      return import("../components/applications/ExplorerApplication.vue");
+    }),
+    icon: "cabinet",
+    contentWidth: 640,
+    contentHeight: 480,
+  },
+  memoryGame: {
+    name: "Memory",
+    title: "Memory Game",
+    component: MemoryGameApplication,
+    icon: "application",
+    width: 720,
+    height: 610,
+    resizable: true,
   },
 };

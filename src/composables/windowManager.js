@@ -34,17 +34,20 @@ export function useWindowManager() {
     const [x, y] = incrementAndgetOffset();
 
     windows.value[newID] = {
-      id,
+      id, // Application ID!
       name,
-      component: markRaw(component),
+      component: component ? markRaw(component) : undefined,
       x,
       y,
       isAtOriginalPosition: true,
+      parent: undefined,
       ...options,
     };
 
     focusOrder.value.push(newID);
     windowOrder.value.push(newID);
+
+    return newID; // Window ID!
   };
 
   const bringToFront = (windowID) => {
@@ -97,10 +100,10 @@ export function useWindowManager() {
         ([, window]) => window.id === id,
       );
       show(windowID);
-      return;
+      return windowID;
     }
 
-    register(id, name, component, data);
+    return register(id, name, component, data);
   };
 
   // Application IDs!

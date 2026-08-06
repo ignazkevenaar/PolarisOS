@@ -6,7 +6,7 @@ $icons-64:
   palette, cd, picture, eightball, model, ferrari, games, ignaz, rolodex,
   wrench, application, grab, winamp, fonts, paintroller, shredder, warning,
   wallpaper, modernmouse, mouse, inspector, error, helmsman, lifesaver, tips,
-  computer, computer2, file, folder;
+  computer, computer2, file, folder, cabinet;
 
 $icons-16: back, forward, home, go, external, refresh, bookmark;
 
@@ -31,12 +31,12 @@ $icons-16: back, forward, home, go, external, refresh, bookmark;
 .icon-64 {
   $icon-size: 64px;
   $icons-per-row: 4;
-
-  width: $icon-size;
-  height: $icon-size;
   filter: drop-shadow(
     var(--icon-shadow-depth) var(--icon-shadow-depth) 0 rgb(0 0 0 / 0.2)
   );
+
+  width: $icon-size;
+  height: $icon-size;
 
   @include unwrapIcons($icons-64, $icon-size, $icons-per-row);
 }

@@ -104,22 +104,26 @@ const version = __APP_VERSION__;
       />
     </div>
 
-    <Component
-      :is="windows[windowID].component"
-      v-for="windowID in windowOrder"
-      v-show="!hiddenWindows.has(windowID)"
-      :window-i-d="windowID"
-      v-bind="windows[windowID]"
-      :key="windowID"
-      :active="focusOrder.at(-1) === windowID && !hiddenWindows.has(windowID)"
-      :z-index="focusOrder.indexOf(windowID) + 1"
-      @focus="bringToFront(windowID)"
-      @drag-move="move(windowID, $event)"
-      @drag-end="move(windowID, $event)"
-      @resize="resize(windowID, $event)"
-      @close="close(windowID)"
-      @minimize="hide(windowID)"
-    ></Component>
+    <template v-for="windowID in windowOrder" :key="windowID">
+      <Component
+        v-if="windows[windowID].component"
+        :is="windows[windowID].component"
+        v-show="!hiddenWindows.has(windowID)"
+        :window-i-d="windowID"
+        v-bind="windows[windowID]"
+        :active="focusOrder.at(-1) === windowID && !hiddenWindows.has(windowID)"
+        :z-index="focusOrder.indexOf(windowID) + 1"
+        @focus="bringToFront(windowID)"
+        @drag-move="move(windowID, $event)"
+        @drag-end="move(windowID, $event)"
+        @resize="resize(windowID, $event)"
+        @close="close(windowID)"
+        @minimize="hide(windowID)"
+      ></Component>
+      <div v-else>
+        <pre>{{ windows[windowID] }}</pre>
+      </div>
+    </template>
     <ApplicationDock :active="focusOrder.at(-1) === 'dock'" />
   </div>
 </template>
@@ -127,33 +131,33 @@ const version = __APP_VERSION__;
 <style>
 html,
 body {
-  background-color: black;
   display: grid;
   place-items: center;
-  height: 100vh;
-  width: 100vw;
   margin: 0;
+  background-color: black;
   padding: 0;
+  width: 100vw;
+  height: 100vh;
 }
 </style>
 
 <style lang="css" scoped>
 .desktop {
   --margin: 32px;
+  display: grid;
 
   position: relative;
-  overflow: hidden;
-  width: 1024px;
-  height: 768px;
+  grid-template-rows: 1fr min-content;
+  z-index: 0; /* Window 'animation' when closing */
   margin: --margin;
   border-radius: 10px;
-  display: grid;
-  grid-template-rows: 1fr min-content;
   image-rendering: pixelated;
-  font-weight: 400;
+  width: 1024px;
+  height: 768px;
+  overflow: hidden;
   font-style: normal;
+  font-weight: 400;
   user-select: none;
-  z-index: 0; /* Window 'animation' when closing */
 }
 
 .clickable {
@@ -167,15 +171,15 @@ body {
 
 .icons {
   --spacing: 24px;
+  display: grid;
 
   position: relative;
+  grid-template-rows: repeat(auto-fit, 110px);
+  grid-auto-columns: 86px;
+  grid-auto-flow: column;
+  gap: var(--spacing);
   z-index: 0;
   padding: var(--spacing);
-  display: grid;
-  grid-auto-columns: 86px;
-  grid-template-rows: repeat(auto-fit, 110px);
-  gap: var(--spacing);
-  grid-auto-flow: column;
   min-height: 0;
   pointer-events: none;
 
@@ -185,12 +189,12 @@ body {
 }
 
 .evaluation {
-  color: white;
-  margin: 4px;
   position: absolute;
+  margin: 4px;
   inset: 0;
-  text-align: right;
+  color: white;
   font-family: monospace;
+  text-align: right;
   text-shadow: 0 1px 0 black;
 }
 </style>

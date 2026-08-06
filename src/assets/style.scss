@@ -42,29 +42,36 @@
   --local-color-dark: color-mix(in srgb, rgb(var(--local-color)), black 10%);
 }
 
+.reserve-space {
+  border-top: var(--border-width) solid transparent;
+  border-right: var(--border-width) solid transparent;
+  border-bottom: var(--border-width) solid transparent;
+  border-left: var(--border-width) solid transparent;
+}
+
 .bevel {
-  border-left: var(--border-width) outset var(--local-color-light);
   border-top: var(--border-width) outset var(--local-color-light);
   border-right: var(--border-width) outset var(--local-color-dark);
   border-bottom: var(--border-width) outset var(--local-color-dark);
+  border-left: var(--border-width) outset var(--local-color-light);
 
   &.interactive:enabled {
     cursor: pointer;
 
     &:active {
-      border-left: var(--border-width) inset var(--local-color-dark);
       border-top: var(--border-width) inset var(--local-color-dark);
       border-right: var(--border-width) inset var(--local-color-light);
       border-bottom: var(--border-width) inset var(--local-color-light);
+      border-left: var(--border-width) inset var(--local-color-dark);
     }
   }
 }
 
 .emboss {
-  border-left: var(--border-width) inset var(--local-color-dark);
   border-top: var(--border-width) inset var(--local-color-dark);
   border-right: var(--border-width) inset var(--local-color-light);
   border-bottom: var(--border-width) inset var(--local-color-light);
+  border-left: var(--border-width) inset var(--local-color-dark);
 }
 
 .text-shadow {
