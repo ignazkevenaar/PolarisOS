@@ -4,14 +4,12 @@ import applications from "../../config/applications.js";
 import IconContainer from "../IconContainer.vue";
 import DockButton from "./DockButton.vue";
 
-const { registerOrSwitch, show, openWindowIDs } = useWindowManager();
+const { registerOrSwitch, processIDsWithOpenWindows } = useWindowManager();
 
 const openOrSwitchApplication = (applicationID) => {
   const application = applications[applicationID];
 
-  if (!application) {
-    show(applicationID);
-  } else {
+  if (application) {
     registerOrSwitch(
       applicationID,
       application.name,
@@ -34,7 +32,7 @@ defineProps({
     <DockButton
       v-for="(applicationID, applicationIndex) in items"
       :key="applicationIndex"
-      :open="openWindowIDs.has(applicationID)"
+      :open="processIDsWithOpenWindows.has(applicationID)"
       :tooltip="applications[applicationID]?.name"
       @click="openOrSwitchApplication(applicationID)"
     >

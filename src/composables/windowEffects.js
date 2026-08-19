@@ -6,10 +6,10 @@ export function useWindowEffects(windowContentElement) {
   const showingDesktopColor = ref(false);
 
   const allDescendants = (node, fn, depth = 1) => {
-    node.childNodes.forEach((child, i) => {
+    for (const [i, child] of node.childNodes.entries()) {
       allDescendants(child, fn, depth + 1);
       fn(child, depth, i);
-    });
+    }
   };
 
   const hideNode = (node) => {
@@ -23,17 +23,20 @@ export function useWindowEffects(windowContentElement) {
     }
   };
 
-  const showNode = (node, depth, index) => {
+  const showNode = async (node, depth, index) => {
     const e = Math.pow(Math.random(), 20);
     const t = index * 10 + e * 30 + 50 * depth;
-    setTimeout(() => {
-      if (node.style) {
-        node.style.opacity = null;
-      }
-    }, t);
+    return new Promise((resolve) =>
+      setTimeout(() => {
+        if (node.style) {
+          node.style.opacity = null;
+        }
+        resolve();
+      }, t),
+    );
   };
 
-  const repaintWindow = () => {
+  const repaintWindow = async () => {
     if (prefersReducedMotion.value) return;
 
     lowestZIndex.value = false;

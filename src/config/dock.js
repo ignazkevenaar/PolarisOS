@@ -1,14 +1,8 @@
 export default [
-  {
-    type: "container",
-    items: ["explorer", "memoryGame", "browser", "utilities"],
-  },
-  {
-    type: "container",
-    items: "runningApplications",
-  },
-  {
-    type: "container",
-    items: ["clock", "trash"],
-  },
+  "explorer",
+  "memoryGame",
+  "browser",
+  "utilities",
+  "clock",
+  "trash",
 ];

@@ -15,15 +15,12 @@ const desktopElement = inject("desktopElement");
 const {
   windows,
   windowOrder,
-  focusOrder,
-  hiddenWindows,
+  minimizedWindows,
   bringToFront,
   move,
   resize,
   close,
-  hide,
-  show,
-  registerOrSwitch,
+  minimize,
 } = useWindowManager();
 </script>
 
@@ -31,19 +28,20 @@ const {
   <Teleport :to="desktopElement">
     <ApplicationWindow
       v-if="windowID"
-      v-show="!hiddenWindows.has(windowID)"
+      v-show="!minimizedWindows.has(windowID)"
       :window-i-d="windowID"
       v-bind="windows[windowID]"
-      :active="focusOrder.at(-1) === windowID && !hiddenWindows.has(windowID)"
-      :z-index="focusOrder.indexOf(windowID) + 1"
+      :active="
+        windowOrder.at(-1) === windowID && !minimizedWindows.has(windowID)
+      "
+      :z-index="windowOrder.indexOf(windowID) + 1"
       @focus="bringToFront(windowID)"
       @drag-move="move(windowID, $event)"
       @drag-end="move(windowID, $event)"
       @resize="resize(windowID, $event)"
       @close="close(windowID)"
-      @minimize="hide(windowID)"
+      @minimize="minimize(windowID)"
     >
-      {{ windowOrder }}
       <slot></slot>
     </ApplicationWindow>
   </Teleport>

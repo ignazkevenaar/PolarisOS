@@ -1,14 +1,16 @@
 <script setup>
 import { onMounted, provide, useTemplateRef } from "vue";
-import ApplicationDock from "./ApplicationDock.vue";
-import MinimizedWindow from "./MinimizedWindow.vue";
+import NewApplicationDock from "./NewApplicationDock.vue";
 import { useWindowManager } from "../composables/windowManager.js";
 import applications from "../config/applications.js";
 import { useSettings } from "../composables/settings.js";
 import { useWallpaper } from "../composables/wallpaper.js";
+import { useProcessManager } from "../composables/processManager.js";
 
 const { settings } = useSettings();
 const { wallpaperStyles } = useWallpaper();
+const { processes, initializeApplications, startApplication, stopProcess } =
+  useProcessManager();
 
 const props = defineProps({
   initialURL: {
@@ -26,15 +28,16 @@ provide("desktopElement", desktopElement);
 const {
   windows,
   windowOrder,
-  focusOrder,
   hiddenWindows,
+  minimizedWindows,
   bringToFront,
   move,
   resize,
   close,
-  hide,
-  show,
+  minimize,
+  focus,
   registerOrSwitch,
+  focusedWindowID,
 } = useWindowManager();
 
 const openBrowser = (URL) => {
@@ -56,6 +59,30 @@ const openBrowser = (URL) => {
 provide("openBrowser", openBrowser);
 
 onMounted(async () => {
+  await initializeApplications();
+
+  // const [newID, done] = createProcess();
+  // console.log("Hello from user land", newID);
+  // await new Promise((resolve) => setTimeout(resolve, 5000));
+  // done(0);
+
+  const { done: applicationOne } = await startApplication(
+    "design.ignaz.polarisos.test",
+  );
+
+  await startApplication("design.ignaz.polarisos.test");
+
+  window.stopProcess = () => {
+    stopProcess(Object.keys(processes.value).at(-1));
+  };
+
+  const { done: applicationTwo } = await startApplication(
+    "polaris/anothertest",
+  );
+
+  await Promise.all([applicationOne, applicationTwo]);
+  console.log("all apps done jeuj");
+
   // Prevent recursive loading in <iframe>
   if (window !== window.top) return;
   if (!props.initialURL) return;
@@ -77,10 +104,6 @@ onMounted(async () => {
   openBrowser(path);
 });
 
-const unfocusWindows = () => {
-  bringToFront("dock");
-};
-
 // eslint-disable-next-line no-undef
 const version = __APP_VERSION__;
 </script>
@@ -93,38 +116,51 @@ const version = __APP_VERSION__;
     ref="desktop"
   >
     <p class="evaluation">Evaluation copy. Version {{ version }}</p>
-    <div class="clickable" @click="unfocusWindows" />
+    <!-- {{ processIDsWithOpenWindows }} -->
+    <!-- <pre style="background-color: rgb(255 255 255 / 0.5)">{{ processes }}</pre> -->
+    <!-- <pre
+      style="
+        background-color: rgb(255 255 255 / 0.5);
+        max-height: 500px;
+        overflow: scroll;
+        position: relative;
+        z-index: 1;
+      "
+      >{{ orderedProcessessAndWindows }}</pre> -->
+    <!-- <div class="clickable" @click="unfocusWindows" /> -->
+    <!--
     <div class="icons">
       <MinimizedWindow
         @click="show(windowID)"
-        v-for="windowID in hiddenWindows"
+        v-for="windowID in minimizedWindows"
         :key="windowID"
         :title="windows[windowID].title"
         :icon="windows[windowID].icon"
       />
     </div>
+    -->
 
-    <template v-for="windowID in windowOrder" :key="windowID">
+    <template v-for="(window, windowID) in windows" :key="windowID">
       <Component
-        v-if="windows[windowID].component"
-        :is="windows[windowID].component"
-        v-show="!hiddenWindows.has(windowID)"
+        :is="window.component"
+        :hidden="minimizedWindows.has(windowID) || hiddenWindows.has(windowID)"
         :window-i-d="windowID"
-        v-bind="windows[windowID]"
-        :active="focusOrder.at(-1) === windowID && !hiddenWindows.has(windowID)"
-        :z-index="focusOrder.indexOf(windowID) + 1"
-        @focus="bringToFront(windowID)"
+        v-bind="window"
+        :active="focusedWindowID === windowID"
+        :z-index="windowOrder.indexOf(windowID) + 1"
+        @focus="
+          focus(windowID);
+          bringToFront(windowID);
+        "
         @drag-move="move(windowID, $event)"
         @drag-end="move(windowID, $event)"
         @resize="resize(windowID, $event)"
         @close="close(windowID)"
-        @minimize="hide(windowID)"
+        @minimize="minimize(windowID)"
       ></Component>
-      <div v-else>
-        <pre>{{ windows[windowID] }}</pre>
-      </div>
     </template>
-    <ApplicationDock :active="focusOrder.at(-1) === 'dock'" />
+    <NewApplicationDock />
+    {{ focusedWindowID }}
   </div>
 </template>
 
@@ -169,7 +205,7 @@ body {
   grid-row: 2;
 }
 
-.icons {
+/* .icons {
   --spacing: 24px;
   display: grid;
 
@@ -186,7 +222,7 @@ body {
   > * {
     pointer-events: initial;
   }
-}
+} */
 
 .evaluation {
   position: absolute;

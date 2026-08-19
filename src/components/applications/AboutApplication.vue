@@ -11,51 +11,48 @@ const openBrowser = inject("openBrowser");
 const baseURL = import.meta.env.BASE_URL;
 </script>
 <template>
-  <ApplicationWindow>
-    <template #content="{ active }">
-      <div class="content">
-        <img
-          :src="`${baseURL}/img/applications/about/splash.png`"
-          alt="PolarisOS logo"
-          class="splash"
-          :class="{ dim: !active }"
-        />
+  <ApplicationWindow v-slot="{ active }">
+    <!-- <template #content="{ active }">
+      <div class="content"> -->
+    <img
+      :src="`${baseURL}/img/applications/about/splash.png`"
+      alt="PolarisOS logo"
+      class="splash"
+      :class="{ dim: !active }"
+    />
 
-        <div class="color-surface bevel legal" :class="{ active }">
-          <div class="row">
-            <LargeIcon icon="ignaz" />
+    <div class="color-surface bevel legal" :class="{ active }">
+      <div class="row">
+        <LargeIcon icon="ignaz" />
 
-            <table>
-              <tbody>
-                <tr>
-                  <td>Version:</td>
-                  <td>{{ version }}</td>
-                </tr>
-                <tr>
-                  <td>Created by:</td>
-                  <td>Ignaz Kevenaar</td>
-                </tr>
-                <tr>
-                  <td>More info and credits:</td>
-                  <td>
-                    <a href="#" @click="openBrowser('index')"
-                      >About PolarisOS</a
-                    >
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            Copyright &copy; 1994 — {{ currentYear }}
-            <a href="https://ignaz.design">Ignaz.design</a>, All rights
-            reserved.<br />
-            This Operating System uses open source software. All third party
-            usages are mentioned in the about page.
-          </p>
-        </div>
+        <table>
+          <tbody>
+            <tr>
+              <td>Version:</td>
+              <td>{{ version }}</td>
+            </tr>
+            <tr>
+              <td>Created by:</td>
+              <td>Ignaz Kevenaar</td>
+            </tr>
+            <tr>
+              <td>More info and credits:</td>
+              <td>
+                <a href="#" @click="openBrowser('index')">About PolarisOS</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </template>
+      <p>
+        Copyright &copy; 1994 — {{ currentYear }}
+        <a href="https://ignaz.design">Ignaz.design</a>, All rights reserved.<br />
+        This Operating System uses open source software. All third party usages
+        are mentioned in the about page.
+      </p>
+    </div>
+    <!-- </div>
+    </template> -->
   </ApplicationWindow>
 </template>
 
@@ -67,9 +64,9 @@ const baseURL = import.meta.env.BASE_URL;
   flex-direction: column;
 
   .splash {
+    background-color: black;
     width: var(--splash-width);
     height: 120px;
-    background-color: black;
 
     &.dim {
       filter: saturate(0.25);
@@ -77,8 +74,8 @@ const baseURL = import.meta.env.BASE_URL;
   }
 
   .legal {
-    padding: 16px;
     box-sizing: border-box;
+    padding: 16px;
     width: var(--splash-width);
 
     p {

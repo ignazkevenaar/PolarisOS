@@ -4,7 +4,11 @@ import dock from "../config/dock.js";
 import { computed } from "vue";
 import DockSeparator from "./dock/DockSeparator.vue";
 import DockContainer from "./dock/DockContainer.vue";
+import { useProcessManager } from "../composables/processManager.js";
+import DockButton from "./dock/DockButton.vue";
+import IconContainer from "./IconContainer.vue";
 
+const { processes, bringProcessToFront } = useProcessManager();
 const { windows } = useWindowManager();
 
 defineProps({
@@ -33,7 +37,7 @@ const parsedDockItems = computed(() =>
   dock
     .map((item) => {
       if (item.type === "container") {
-        if (item.items === "runningApplications") {
+        if (item.items === "openWindows") {
           if (openWindowsNotAlreadyInDock.value.length > 0) {
             return {
               ...item,
@@ -41,9 +45,9 @@ const parsedDockItems = computed(() =>
             };
           }
           return;
+        } else {
+          return item.items.length > 0 ? item : undefined;
         }
-
-        return item.items.length > 0 ? item : undefined;
       }
     })
     .filter(Boolean),
@@ -60,6 +64,15 @@ const parsedDockItems = computed(() =>
           />
           <DockSeparator v-if="index < parsedDockItems.length - 1" />
         </template>
+
+        <DockSeparator />
+        <DockButton
+          v-for="process in processes"
+          :key="process"
+          @click="bringProcessToFront(process)"
+        >
+          <IconContainer icon="file" />
+        </DockButton>
       </div>
     </div>
   </div>
@@ -67,9 +80,9 @@ const parsedDockItems = computed(() =>
 
 <style lang="css" scoped>
 .dockContainer {
-  width: 100%;
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .dock {

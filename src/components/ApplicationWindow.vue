@@ -64,6 +64,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  alwaysOnTop: {
+    type: Boolean,
+  },
+  hidden: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -122,7 +129,7 @@ const { style } = useDraggable(windowElement, {
       await paintDesktopColor();
       initialDragPosition = undefined;
       dragging.value = false;
-      repaintWindow();
+      await repaintWindow();
     }
     emit("dragEnd", position, event);
   },
@@ -143,7 +150,7 @@ const windowStyles = computed(() => ({
   top: maybeConvertStyleToPX(props.y),
   width: maybeConvertStyleToPX(props.width),
   height: maybeConvertStyleToPX(props.height),
-  zIndex: lowestZIndex.value ? -100 : props.zIndex,
+  zIndex: props.alwaysOnTop ? 100 : lowestZIndex.value ? -100 : props.zIndex,
 }));
 
 const contentStyles = computed(() => ({
@@ -176,13 +183,13 @@ onMounted(() => {
 
   watch(
     () => [props.zIndex, props.active],
-    ([newZ, newActive], oldValues) => {
+    async ([newZ, newActive], oldValues) => {
       if (oldValues === undefined) {
-        repaintWindow();
+        await repaintWindow();
         return;
       }
       const [oldZ] = oldValues;
-      if ((newZ && newZ > oldZ) || newActive) repaintWindow();
+      if ((newZ && newZ > oldZ) || newActive) await repaintWindow();
     },
     { immediate: true },
   );
@@ -194,13 +201,23 @@ const onClose = async () => {
 };
 
 const onMinimize = async () => {
+  // Offender
   await paintDesktopColor();
   emit("minimize");
 };
+
+watch(
+  () => props.hidden,
+  (newHidden) => {
+    // This enables background windows to repaint after showing
+    if (!newHidden) repaintWindow();
+  },
+);
 </script>
 
 <template>
   <div
+    v-show="!hidden"
     ref="window"
     :style="[windowStyles]"
     @pointerdown="emit('focus')"
@@ -211,6 +228,7 @@ const onMinimize = async () => {
       transparent,
       desktopColor: showingDesktopColor,
       shadow: !showingDesktopColor,
+      alwaysOnTop,
     }"
   >
     <div
@@ -285,14 +303,14 @@ const onMinimize = async () => {
 }
 
 .windowWrapper {
+  display: grid;
   position: absolute;
   min-width: 150px;
   min-height: 150px;
-  display: grid;
 
   &.resizable {
-    resize: both;
     overflow: hidden;
+    resize: both;
   }
 
   &.shadow:not(.transparent) {
@@ -321,27 +339,31 @@ const onMinimize = async () => {
       animation: 0.1s wipe both steps(8);
     }
   }
+
+  &.alwaysOnTop {
+    z-index: 100;
+  }
 }
 
 .window {
   display: grid;
+  box-sizing: border-box;
+  padding: 2px;
+  height: 100%;
   overflow: hidden;
   user-select: none;
-  height: 100%;
-  padding: 2px;
-  box-sizing: border-box;
 
   &.transparent {
     background-color: transparent;
   }
 
   .container {
-    text-rendering: geometricPrecision;
+    display: flex;
+    flex-direction: column;
     box-sizing: border-box;
     height: 100%;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    text-rendering: geometricPrecision;
 
     .transparent & {
       background-color: transparent;
@@ -350,45 +372,45 @@ const onMinimize = async () => {
 
   .titleBar {
     --border-width: 1px;
+    display: flex;
 
     flex: 0 0 auto;
-    min-height: 18px;
-    display: flex;
     box-shadow:
       0 1px 0 rgb(0 0 0 / 0.15),
       0 2px 0 rgb(0 0 0 / 0.15);
+    min-height: 18px;
 
     .handle {
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
-      vertical-align: middle;
       display: flex;
+      flex: 1;
       justify-content: center;
       align-items: center;
+      vertical-align: middle;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
       .spacer {
+        flex: 0 1 auto;
         aspect-ratio: 1;
         height: 100%;
-        flex: 0 1 auto;
       }
     }
 
     button {
-      appearance: none;
-      font-family: inherit;
-      aspect-ratio: 1;
       display: grid;
       place-items: center;
+      appearance: none;
+      aspect-ratio: 1;
+      font-family: inherit;
 
       .glyph {
         --border-width: 1px;
         display: block;
+        box-shadow: 1px 1px 0 rgb(0 0 0 / 0.1);
         width: 12px;
         height: 2px;
-        box-shadow: 1px 1px 0 rgb(0 0 0 / 0.1);
 
         &.close {
           width: 10px;
@@ -416,17 +438,17 @@ const onMinimize = async () => {
 
 .dragShadow {
   position: absolute;
-  box-sizing: border-box;
   z-index: 100;
+  box-sizing: border-box;
   pointer-events: none;
   /* Terrible way to create an inverted border... */
   &::before,
   &::after {
-    content: "";
     display: block;
     position: absolute;
-    inset: 0;
     backdrop-filter: invert(1);
+    inset: 0;
+    content: "";
   }
 
   &::after {
