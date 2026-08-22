@@ -3,7 +3,7 @@ import { computed, markRaw, ref } from "vue";
 const windows = ref({});
 const windowOrder = ref([]);
 const hiddenWindows = ref(new Set());
-const minimizedWindows = ref(new Set());
+const minimizedWindowIDs = ref(new Set());
 const focusedWindowID = ref(undefined);
 
 // Opens every new window with a little offset so their titlebars don't overlap
@@ -29,30 +29,33 @@ const maybeDecreaseTiling = (window) => {
   }
 };
 
-export function useWindowManager() {
-  const register = (processID, name, component, options, parentWindowID) => {
-    const newWindowID = crypto.randomUUID();
+class Window {
+  constructor(processID, component, options, parentWindowID) {
+    this.processID = processID;
+    this.component = component ? markRaw(component) : undefined;
+    this.parentWindowID = parentWindowID;
+
+    this.windowID = crypto.randomUUID();
+    this.createdAt = new Date().getTime();
     const [x, y] = incrementAndgetOffset();
+    this.x = x;
+    this.y = y;
+    this.isAtOriginalPosition = true;
+    this.options = options; // TODO: ensure to handle these options
+  }
 
-    windows.value[newWindowID] = {
-      processID,
-      name,
-      component: component ? markRaw(component) : undefined,
-      x,
-      y,
-      isAtOriginalPosition: true,
-      parent: undefined,
-      ...options,
-      parentWindowID,
-      createdAt: new Date().getTime(), // Used for interlacing process and window items on dock.
-    };
+  move(x, y) {
+    maybeDecreaseTiling(window);
+    this.x = x;
+    this.y = y;
+  }
 
-    windowOrder.value.push(newWindowID);
+  resize(width, height) {
+    this.width = width;
+    this.height = height;
+  }
 
-    return newWindowID;
-  };
-
-  const bringToFront = (windowID, ignoreRelationships = false) => {
+  bringToFront(ignoreRelationships = false) {
     // Decide:
     // - What do do when windows are minimized?
     // - How to pass "disabled" or "overlaid" state to window itself.
@@ -61,18 +64,18 @@ export function useWindowManager() {
 
     if (!ignoreRelationships) {
       // If you focus child window, bring up parent window first.
-      const parentWindowID = windows.value[windowID].parentWindowID;
-      if (parentWindowID) bringToFront(parentWindowID, true);
+      if (this.parentWindowID)
+        windows.value[this.parentWindowID].bringToFront(true);
     }
 
-    const index = windowOrder.value.indexOf(windowID);
+    const index = windowOrder.value.indexOf(this.windowID);
     if (index < 0) {
       console.error("No window!");
     }
 
     // show(windowID);
-    const element = windowOrder.value.splice(index, 1);
-    windowOrder.value.splice(windowOrder.value.length, 0, element[0]);
+    const [element] = windowOrder.value.splice(index, 1);
+    windowOrder.value.push(element);
 
     // `Modal`
     // Blink window if modal?
@@ -82,88 +85,81 @@ export function useWindowManager() {
       Object.entries(windows.value)
         .filter(
           ([possibleWindowID, window]) =>
-            window.parentWindowID === windowID &&
-            !minimizedWindows.value.has(possibleWindowID),
+            window.parentWindowID === this.windowID &&
+            !minimizedWindowIDs.value.has(possibleWindowID),
         )
-        .map(([childWindowID]) => bringToFront(childWindowID, true));
+        .map(([, childWindow]) => childWindow.bringToFront(true));
     }
-  };
+  }
 
-  const move = (windowID, position) => {
-    const window = windows.value[windowID];
-    maybeDecreaseTiling(window);
+  focus() {
+    focusedWindowID.value = this.windowID;
+  }
 
-    window.x = position.x;
-    window.y = position.y;
-  };
-
-  const resize = (windowID, size) => {
-    const window = windows.value[windowID];
-    window.width = size.width;
-    window.height = size.height;
-  };
-
-  const close = (windowID) => {
-    const window = windows.value[windowID];
-    maybeDecreaseTiling(window);
-
-    delete windows.value[windowID];
-    const focusIndex = windowOrder.value.indexOf(windowID);
-    windowOrder.value.splice(focusIndex, 1);
-  };
-
-  const hide = (windowID) => {
-    const window = windows.value[windowID];
-    if (window) {
-      window.hiddenAt = new Date().getTime();
-      hiddenWindows.value.add(windowID);
-    }
-  };
-
-  // Rather slow
-  const getChildWindows = (windowID) =>
-    Object.entries(windows.value).filter(
-      ([, filterWindow]) => filterWindow.parentWindowID === windowID,
+  minimize() {
+    this.getChildWindows(this.windowID).map(([, childWindow]) =>
+      childWindow.hide(),
     );
+    this.minimizedAt = new Date().getTime();
+    minimizedWindowIDs.value.add(this.windowID);
+  }
 
-  const minimize = (windowID) => {
-    const window = windows.value[windowID];
-    if (window) {
-      getChildWindows(windowID).map(([childWindowID]) => hide(childWindowID));
-      window.minimizedAt = new Date().getTime();
-      minimizedWindows.value.add(windowID);
-    }
+  hide() {
+    this.hiddenAt = new Date().getTime();
+    hiddenWindows.value.add(this.windowID);
+  }
+
+  show() {
+    this.getChildWindows().map(([, childWindow]) => childWindow.show());
+    delete this.hiddenAt;
+    hiddenWindows.value.delete(this.windowID);
+    delete this.minimizedAt;
+    minimizedWindowIDs.value.delete(this.windowID);
+    this.bringToFront();
+  }
+
+  close() {
+    maybeDecreaseTiling(window);
+
+    delete windows.value[this.windowID];
+    const focusIndex = windowOrder.value.indexOf(this.windowID);
+    windowOrder.value.splice(focusIndex, 1);
+  }
+
+  changeTitle(title) {
+    this.title = title;
+  }
+
+  getChildWindows() {
+    // Rather slow
+    return Object.entries(windows.value).filter(
+      ([, filterWindow]) => filterWindow.parentWindowID === this.windowID,
+    );
+  }
+}
+
+export function useWindowManager() {
+  const createWindow = (processID, component, options, parentWindowID) => {
+    const window = new Window(processID, component, options, parentWindowID);
+    windows.value[window.windowID] = window;
+
+    windowOrder.value.push(window.windowID);
+    window.focus();
+
+    return window;
   };
 
-  const show = (windowID) => {
-    const window = windows.value[windowID];
-    if (window) {
-      getChildWindows(windowID).map(([childWindowID]) => show(childWindowID));
-      delete window.hiddenAt;
-      hiddenWindows.value.delete(windowID);
-      delete window.minimizedAt;
-      minimizedWindows.value.delete(windowID);
-      bringToFront(windowID);
-    }
-  };
-
-  const focus = (windowID) => {
-    const window = windows.value[windowID];
-    if (window) {
-      focusedWindowID.value = windowID;
-    }
-  };
-
-  const registerOrSwitch = (processID, name, component, data) => {
+  const createOrSwitchToExistingWindow = (processID, component, data) => {
     if (processIDsWithOpenWindows.value.has(processID)) {
-      const [windowID] = Object.entries(windows.value).find(
+      // TODO: Slow
+      const [, window] = Object.entries(windows.value).find(
         ([, window]) => window.processID === processID,
       );
-      show(windowID);
-      return windowID;
+      window.show();
+      return window;
     }
 
-    return register(processID, name, component, data);
+    return createWindow(processID, component, data);
   };
 
   const processIDsWithOpenWindows = computed(() => {
@@ -183,27 +179,14 @@ export function useWindowManager() {
     return result;
   });
 
-  const changeTitle = (windowID, title) => {
-    windows.value[windowID].title = title;
-  };
-
   return {
     windows,
     windowOrder,
     hiddenWindows,
-    minimizedWindows,
+    minimizedWindowIDs,
     processIDsWithOpenWindows,
-    register,
-    bringToFront,
-    registerOrSwitch,
-    move,
-    resize,
-    close,
-    hide,
-    minimize,
-    show,
-    focus,
-    changeTitle,
+    createWindow,
+    createOrSwitchToExistingWindow,
     openWindowsPerProcessID,
     focusedWindowID,
   };

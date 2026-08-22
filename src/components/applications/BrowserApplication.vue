@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import ApplicationWindow from "../ApplicationWindow.vue";
-import { useWindowManager } from "../../composables/windowManager.js";
 import StyledInput from "../StyledInput.vue";
 import bookmarks from "../../config/bookmarks.js";
 import IconButton from "../IconButton.vue";
@@ -11,11 +10,10 @@ import { useSettings } from "../../composables/settings.js";
 import SmallIcon from "../SmallIcon.vue";
 
 const { settings } = useSettings();
-const { changeTitle } = useWindowManager();
 
 const props = defineProps({
-  windowID: {
-    type: String,
+  window: {
+    type: Window,
     required: true,
   },
   initialURL: { type: String, default: undefined },
@@ -86,7 +84,7 @@ const onNavigate = (event) => {
     `${baseURL}/${normalizedURL}`,
   );
   browserLocation.value = currentURL.value;
-  changeTitle(props.windowID, `${contentWindow.document.title} — Browser`);
+  props.window?.changeTitle(`${contentWindow.document.title} — Browser`);
 
   injectStyles(windowElement.value.$el, contentWindow.document.documentElement);
   bubbleIframePointerEvents(event.target);
@@ -218,11 +216,11 @@ onMounted(() => {
 
 <style lang="css" scoped>
 .container {
-  margin: 6px;
-  place-self: stretch;
-  position: relative;
   display: grid;
+  position: relative;
   place-items: stretch;
+  place-self: stretch;
+  margin: 6px;
 
   iframe {
     border: none;
@@ -254,21 +252,21 @@ onMounted(() => {
 
   input {
     flex: 1;
-    min-width: 0;
     margin: 4px;
+    min-width: 0;
   }
 
   .throbberContainer {
-    aspect-ratio: 1;
     display: grid;
     place-items: center;
+    aspect-ratio: 1;
   }
 
   .throbber {
-    height: 48px;
-    width: 48px;
-    background-color: black;
     box-sizing: content-box;
+    background-color: black;
+    width: 48px;
+    height: 48px;
 
     &.on {
       animation: throbber 1s both;
@@ -278,23 +276,23 @@ onMounted(() => {
 
 .bookmarks {
   ul {
+    display: flex;
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style-type: none;
-    display: flex;
-    gap: 8px;
 
     li {
-      padding: 2px 4px;
       display: flex;
       align-items: center;
       gap: 4px;
+      padding: 2px 4px;
 
       a,
       a:visited {
-        text-decoration: none;
-        color: inherit;
         cursor: pointer;
+        color: inherit;
+        text-decoration: none;
 
         &:hover {
           text-decoration: underline;

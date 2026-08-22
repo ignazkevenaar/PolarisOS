@@ -152,7 +152,7 @@ export function useProcessManager() {
 
     if (sortedWindowsForApplication.length > 0 && allWindowsMinimized) {
       // TODO every is true for empty collections
-      show(sortedWindowsForApplication.at(-1)[0]);
+      sortedWindowsForApplication.at(-1)[1].show();
     } else {
       const windowIDswindowOrder = windowOrder.value.filter((windowID) => {
         const window = windows.value[windowID];
@@ -161,7 +161,9 @@ export function useProcessManager() {
 
       windowIDswindowOrder.forEach((windowID) => {
         const window = windows.value[windowID];
-        if (!window.minimizedAt && !window.hiddenAt) show(windowID);
+        if (!window.minimizedAt && !window.hiddenAt) {
+          windows.value[windowID].show();
+        }
       });
     }
   };

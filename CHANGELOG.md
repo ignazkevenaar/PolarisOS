@@ -12,6 +12,7 @@
 ### Changed
 
 - Improve fallback routing
+- Rework window manager to be reparenting.
 
 ## 0.3.0 - 2026-07-16
 

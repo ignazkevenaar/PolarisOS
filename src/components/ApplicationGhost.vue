@@ -4,43 +4,37 @@ import { useWindowManager } from "../composables/windowManager";
 import ApplicationWindow from "./ApplicationWindow.vue";
 
 defineProps({
-  windowID: {
+  window: {
     type: String,
     required: true,
   },
 });
 
+const { windowOrder, minimizedWindowIDs } = useWindowManager();
 const desktopElement = inject("desktopElement");
-
-const {
-  windows,
-  windowOrder,
-  minimizedWindows,
-  bringToFront,
-  move,
-  resize,
-  close,
-  minimize,
-} = useWindowManager();
 </script>
 
 <template>
   <Teleport :to="desktopElement">
     <ApplicationWindow
-      v-if="windowID"
-      v-show="!minimizedWindows.has(windowID)"
-      :window-i-d="windowID"
-      v-bind="windows[windowID]"
+      v-if="window"
+      v-show="!minimizedWindowIDs.has(window.windowID)"
+      :window-i-d="window.windowID"
+      v-bind="window.options"
       :active="
-        windowOrder.at(-1) === windowID && !minimizedWindows.has(windowID)
+        windowOrder.at(-1) === window.windowID &&
+        !minimizedWindowIDs.has(window.windowID)
       "
-      :z-index="windowOrder.indexOf(windowID) + 1"
-      @focus="bringToFront(windowID)"
-      @drag-move="move(windowID, $event)"
-      @drag-end="move(windowID, $event)"
-      @resize="resize(windowID, $event)"
-      @close="close(windowID)"
-      @minimize="minimize(windowID)"
+      :z-index="windowOrder.indexOf(window.windowID) + 1"
+      @focus="
+        window.bringToFront();
+        window.focus();
+      "
+      @drag-move="window.move($event.x, $event.y)"
+      @drag-end="window.move($event.x, $event.y)"
+      @resize="window.resize($event.width, $event.height)"
+      @close="window.close()"
+      @minimize="window.minimize()"
     >
       <slot></slot>
     </ApplicationWindow>

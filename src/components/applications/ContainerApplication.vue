@@ -5,7 +5,7 @@ import ApplicationWindow from "../ApplicationWindow.vue";
 import { useWindowManager } from "../../composables/windowManager.js";
 import IconContainer from "../IconContainer.vue";
 
-const { registerOrSwitch } = useWindowManager();
+const { createOrSwitchToExistingWindow } = useWindowManager();
 
 defineProps({
   items: {
@@ -23,9 +23,8 @@ const getSelectedClasses = (index, selectedIndex, active) =>
 
 const openOrSwitchApplication = (applicationID) => {
   const application = applications[applicationID];
-  registerOrSwitch(
+  createOrSwitchToExistingWindow(
     applicationID,
-    application.name,
     application.component,
     application,
   );
@@ -75,10 +74,10 @@ const openBrowser = inject("openBrowser");
   grid-template-columns: repeat(auto-fill, 100px);
   grid-auto-rows: minmax(120px, 150px);
   place-items: start center;
-  padding: 8px;
-  gap: 8px;
   place-self: stretch;
+  gap: 8px;
   margin: 6px;
+  padding: 8px;
   overflow: auto;
 }
 
@@ -94,8 +93,8 @@ const openBrowser = inject("openBrowser");
 
   .label {
     margin-top: 4px;
-    text-align: center;
     user-select: none;
+    text-align: center;
 
     &:not(.bevel) {
       padding-top: 6px; /* Border width */

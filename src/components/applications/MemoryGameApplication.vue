@@ -7,7 +7,7 @@ import DialogWindow from "../DialogWindow.vue";
 import { useWindowManager } from "../../composables/windowManager.js";
 import ApplicationGhost from "../ApplicationGhost.vue";
 
-const { registerOrSwitch } = useWindowManager();
+const { createOrSwitchToExistingWindow } = useWindowManager();
 
 const iconNames = [
   "clock",
@@ -109,7 +109,7 @@ const tryCell = async (index) => {
 
 const newGameDialogOpen = ref(false);
 const testDialog = ref(undefined);
-const dialogID = ref(undefined);
+const dialogWindow = ref(undefined);
 
 const maybeNewGame = async () => {
   newGameDialogOpen.value = true;
@@ -117,23 +117,22 @@ const maybeNewGame = async () => {
   await nextTick();
   console.log(testDialog.value);
 
-  const id = registerOrSwitch(
+  const window = createOrSwitchToExistingWindow(
     "com.memory.newgame",
-    "New game?",
     /*DialogWindow*/ undefined,
     {
       text: "werkt dit?",
     },
   );
 
-  dialogID.value = id;
+  dialogWindow.value = window;
 };
 </script>
 <template>
   <ApplicationWindow>
     <div class="toolbar">
       <IconButton text="New game..." @click="maybeNewGame" />
-      <ApplicationGhost :window-i-d="dialogID" v-if="newGameDialogOpen">
+      <ApplicationGhost :window="dialogWindow" v-if="newGameDialogOpen">
         <div>Do you want to start a new game, really!? are you mad!?</div>
       </ApplicationGhost>
     </div>

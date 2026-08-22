@@ -4,15 +4,15 @@ import applications from "../../config/applications.js";
 import IconContainer from "../IconContainer.vue";
 import DockButton from "./DockButton.vue";
 
-const { registerOrSwitch, processIDsWithOpenWindows } = useWindowManager();
+const { createOrSwitchToExistingWindow, processIDsWithOpenWindows } =
+  useWindowManager();
 
 const openOrSwitchApplication = (applicationID) => {
   const application = applications[applicationID];
 
   if (application) {
-    registerOrSwitch(
+    createOrSwitchToExistingWindow(
       applicationID,
-      application.name,
       application.component,
       application,
     );

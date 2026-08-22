@@ -1,7 +1,7 @@
 import ClockIcon from "../../../components/icons/ClockIcon.vue";
 import { useWindowManager } from "../../../composables/windowManager";
 import { defineAsyncComponent, markRaw, watch } from "vue";
-const { register, processIDsWithOpenWindows } = useWindowManager();
+const { createWindow, processIDsWithOpenWindows } = useWindowManager();
 
 export default {
   name: "test application from manifest!",
@@ -14,9 +14,8 @@ export default {
       });
     });
 
-    const parentWindowID = register(
+    const parentWindow = createWindow(
       processID,
-      "anotherWindow",
       defineAsyncComponent(
         () => import("../../../components/applications/AboutApplication.vue"),
       ),
@@ -24,9 +23,8 @@ export default {
     );
 
     // Child window!
-    register(
+    createWindow(
       processID,
-      "window",
       defineAsyncComponent(
         () => import("../../../components/applications/ClockApplication.vue"),
       ),
@@ -37,21 +35,19 @@ export default {
         },
         // alwaysOnTop: true,
       },
-      parentWindowID,
+      parentWindow.windowID,
     );
 
-    register(
+    createWindow(
       processID,
-      "thirdWindow",
       defineAsyncComponent(
         () => import("../../../components/applications/AboutApplication.vue"),
       ),
       { icon: "error" },
     );
 
-    register(
+    createWindow(
       processID,
-      "forthWindow",
       defineAsyncComponent(
         () =>
           import("../../../components/applications/MemoryGameApplication.vue"),

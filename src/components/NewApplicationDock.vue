@@ -9,7 +9,7 @@ import applications from "../config/applications.js";
 import dock from "../config/dock.js";
 
 const { processes, bringProcessToFront, processOrder } = useProcessManager();
-const { windows, show, registerOrSwitch } = useWindowManager();
+const { windows, createOrSwitchToExistingWindow } = useWindowManager();
 
 const orderedProcessessAndWindows = computed(() => {
   const result = [];
@@ -20,8 +20,8 @@ const orderedProcessessAndWindows = computed(() => {
   });
 
   // Windows
-  Object.entries(windows.value).map(([windowID, window]) => {
-    if (window.minimizedAt > 0) result.push({ ...window, windowID });
+  Object.entries(windows.value).map(([, window]) => {
+    if (window.minimizedAt > 0) result.push(window);
   });
 
   result.sort((a, b) => {
@@ -42,8 +42,7 @@ const selectItem = (item) => {
     // Application
     bringProcessToFront(item.processID);
   } else {
-    // Window
-    show(item.windowID);
+    item.show();
   }
 };
 
@@ -55,9 +54,8 @@ const startApplication = (applicationID) => {
     return;
   }
 
-  registerOrSwitch(
+  createOrSwitchToExistingWindow(
     applicationID,
-    application.name,
     application.component,
     application,
   );
@@ -80,10 +78,10 @@ const startApplication = (applicationID) => {
       :key="itemIndex"
       @click="selectItem(item)"
     >
-      <IconContainer :icon="item.icon"></IconContainer>
+      <IconContainer :icon="item.icon ?? item.options?.icon"></IconContainer>
     </DockButton>
     <!-- {{ activeProcess }} -->
-    {{ processOrder.at(-1) }}
+    <!-- {{ processOrder.at(-1) }} -->
   </div>
 </template>
 

@@ -29,14 +29,8 @@ const {
   windows,
   windowOrder,
   hiddenWindows,
-  minimizedWindows,
-  bringToFront,
-  move,
-  resize,
-  close,
-  minimize,
-  focus,
-  registerOrSwitch,
+  minimizedWindowIDs,
+  createOrSwitchToExistingWindow,
   focusedWindowID,
 } = useWindowManager();
 
@@ -44,8 +38,7 @@ const openBrowser = (URL) => {
   if (!URL) return;
 
   const browserApplication = applications.browser;
-  registerOrSwitch(
-    "browser",
+  createOrSwitchToExistingWindow(
     browserApplication.name,
     browserApplication.component,
     {
@@ -116,51 +109,30 @@ const version = __APP_VERSION__;
     ref="desktop"
   >
     <p class="evaluation">Evaluation copy. Version {{ version }}</p>
-    <!-- {{ processIDsWithOpenWindows }} -->
-    <!-- <pre style="background-color: rgb(255 255 255 / 0.5)">{{ processes }}</pre> -->
-    <!-- <pre
-      style="
-        background-color: rgb(255 255 255 / 0.5);
-        max-height: 500px;
-        overflow: scroll;
-        position: relative;
-        z-index: 1;
-      "
-      >{{ orderedProcessessAndWindows }}</pre> -->
-    <!-- <div class="clickable" @click="unfocusWindows" /> -->
-    <!--
-    <div class="icons">
-      <MinimizedWindow
-        @click="show(windowID)"
-        v-for="windowID in minimizedWindows"
-        :key="windowID"
-        :title="windows[windowID].title"
-        :icon="windows[windowID].icon"
-      />
-    </div>
-    -->
-
     <template v-for="(window, windowID) in windows" :key="windowID">
       <Component
         :is="window.component"
-        :hidden="minimizedWindows.has(windowID) || hiddenWindows.has(windowID)"
-        :window-i-d="windowID"
-        v-bind="window"
+        :hidden="
+          minimizedWindowIDs.has(windowID) || hiddenWindows.has(windowID)
+        "
+        :window="window"
+        :x="window.x"
+        :y="window.y"
+        v-bind="window.options"
         :active="focusedWindowID === windowID"
         :z-index="windowOrder.indexOf(windowID) + 1"
         @focus="
-          focus(windowID);
-          bringToFront(windowID);
+          window.focus();
+          window.bringToFront();
         "
-        @drag-move="move(windowID, $event)"
-        @drag-end="move(windowID, $event)"
-        @resize="resize(windowID, $event)"
-        @close="close(windowID)"
-        @minimize="minimize(windowID)"
+        @drag-move="window.move($event.x, $event.y)"
+        @drag-end="window.move($event.x, $event.y)"
+        @resize="window.resize($event.width, $event.height)"
+        @close="window.close()"
+        @minimize="window.minimize()"
       ></Component>
     </template>
     <NewApplicationDock />
-    {{ focusedWindowID }}
   </div>
 </template>
 
