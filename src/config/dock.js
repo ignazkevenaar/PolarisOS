@@ -1,8 +1,1 @@
-export default [
-  "explorer",
-  "memoryGame",
-  "browser",
-  "utilities",
-  "clock",
-  "trash",
-];
+export default ["documentApplication"];

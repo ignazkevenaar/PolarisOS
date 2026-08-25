@@ -34,7 +34,6 @@ class Window {
     this.processID = processID;
     this.component = component ? markRaw(component) : undefined;
     this.parentWindowID = parentWindowID;
-
     this.windowID = crypto.randomUUID();
     this.createdAt = new Date().getTime();
     const [x, y] = incrementAndgetOffset();
@@ -76,6 +75,7 @@ class Window {
     // show(windowID);
     const [element] = windowOrder.value.splice(index, 1);
     windowOrder.value.push(element);
+    this.focus();
 
     // `Modal`
     // Blink window if modal?
@@ -144,7 +144,7 @@ export function useWindowManager() {
     windows.value[window.windowID] = window;
 
     windowOrder.value.push(window.windowID);
-    window.focus();
+    window.bringToFront();
 
     return window;
   };
@@ -172,14 +172,19 @@ export function useWindowManager() {
     // [processID]: windowID[]
     const result = {};
 
-    Object.entries(windows.value).map(([windowID, window]) => {
-      if (window.processID) (result[window.processID] ??= []).push(windowID);
+    Object.entries(windows.value).map(([, window]) => {
+      if (window.processID) (result[window.processID] ??= []).push(window);
     });
 
     return result;
   });
 
+  const unfocusActiveWindow = () => {
+    focusedWindowID.value = undefined;
+  };
+
   return {
+    Window,
     windows,
     windowOrder,
     hiddenWindows,
@@ -189,5 +194,6 @@ export function useWindowManager() {
     createOrSwitchToExistingWindow,
     openWindowsPerProcessID,
     focusedWindowID,
+    unfocusActiveWindow,
   };
 }

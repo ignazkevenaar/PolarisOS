@@ -26,10 +26,7 @@ const desktopElement = inject("desktopElement");
         !minimizedWindowIDs.has(window.windowID)
       "
       :z-index="windowOrder.indexOf(window.windowID) + 1"
-      @focus="
-        window.bringToFront();
-        window.focus();
-      "
+      @focus="window.bringToFront()"
       @drag-move="window.move($event.x, $event.y)"
       @drag-end="window.move($event.x, $event.y)"
       @resize="window.resize($event.width, $event.height)"

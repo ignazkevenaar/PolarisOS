@@ -9,8 +9,7 @@ import { useProcessManager } from "../composables/processManager.js";
 
 const { settings } = useSettings();
 const { wallpaperStyles } = useWallpaper();
-const { processes, initializeApplications, startApplication, stopProcess } =
-  useProcessManager();
+const { initializeApplications, startApplication } = useProcessManager();
 
 const props = defineProps({
   initialURL: {
@@ -54,27 +53,9 @@ provide("openBrowser", openBrowser);
 onMounted(async () => {
   await initializeApplications();
 
-  // const [newID, done] = createProcess();
-  // console.log("Hello from user land", newID);
-  // await new Promise((resolve) => setTimeout(resolve, 5000));
-  // done(0);
-
-  const { done: applicationOne } = await startApplication(
-    "design.ignaz.polarisos.test",
-  );
-
-  await startApplication("design.ignaz.polarisos.test");
-
-  window.stopProcess = () => {
-    stopProcess(Object.keys(processes.value).at(-1));
+  window.withPath = () => {
+    startApplication("documentApplication", "somePath");
   };
-
-  const { done: applicationTwo } = await startApplication(
-    "polaris/anothertest",
-  );
-
-  await Promise.all([applicationOne, applicationTwo]);
-  console.log("all apps done jeuj");
 
   // Prevent recursive loading in <iframe>
   if (window !== window.top) return;
@@ -121,10 +102,7 @@ const version = __APP_VERSION__;
         v-bind="window.options"
         :active="focusedWindowID === windowID"
         :z-index="windowOrder.indexOf(windowID) + 1"
-        @focus="
-          window.focus();
-          window.bringToFront();
-        "
+        @focus="window.bringToFront()"
         @drag-move="window.move($event.x, $event.y)"
         @drag-end="window.move($event.x, $event.y)"
         @resize="window.resize($event.width, $event.height)"
@@ -176,25 +154,6 @@ body {
 .dock {
   grid-row: 2;
 }
-
-/* .icons {
-  --spacing: 24px;
-  display: grid;
-
-  position: relative;
-  grid-template-rows: repeat(auto-fit, 110px);
-  grid-auto-columns: 86px;
-  grid-auto-flow: column;
-  gap: var(--spacing);
-  z-index: 0;
-  padding: var(--spacing);
-  min-height: 0;
-  pointer-events: none;
-
-  > * {
-    pointer-events: initial;
-  }
-} */
 
 .evaluation {
   position: absolute;

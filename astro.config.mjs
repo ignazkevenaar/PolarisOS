@@ -1,7 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import process from "process";
-
+import { fileURLToPath, URL } from "url";
 import vue from "@astrojs/vue";
 
 // https://astro.build/config
@@ -17,6 +17,14 @@ export default defineConfig({
   vite: {
     define: {
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+    },
+    resolve: {
+      alias: [
+        {
+          find: "@",
+          replacement: fileURLToPath(new URL("./src", import.meta.url)),
+        },
+      ],
     },
     build: {
       rolldownOptions: {

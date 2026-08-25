@@ -1,13 +1,95 @@
-import { ref, computed } from "vue";
+import { ref, computed, toValue } from "vue";
 import { useWindowManager } from "./windowManager";
 
 const processes = ref({});
 const processOrder = ref([]);
 
-let applicationIndex = {};
+let applicationIndex = ref({});
 
-const { windows, windowOrder, openWindowsPerProcessID, close, show } =
-  useWindowManager();
+const {
+  windows,
+  windowOrder,
+  openWindowsPerProcessID,
+  unfocusActiveWindow,
+  createWindow,
+} = useWindowManager();
+
+class Process {
+  constructor(applicationID, name, icon) {
+    this.processID = crypto.randomUUID();
+    this.createdAt = new Date().getTime();
+    this.applicationID = applicationID;
+    this.name = name ?? "untitled";
+    this.icon = icon ?? "application";
+    this.eventHandlers = {};
+
+    this.windows = computed(() =>
+      Object.fromEntries(
+        Object.entries(windows.value).filter(
+          ([, window]) => window.processID === this.processid,
+        ),
+      ),
+    );
+  }
+
+  stop() {
+    openWindowsPerProcessID.value[this.processID]?.map((window) =>
+      window.close(),
+    );
+  }
+
+  bringToFront() {
+    unfocusActiveWindow();
+
+    const processIndex = processOrder.value.indexOf(this.processID);
+    processOrder.value.splice(processIndex, 1);
+    processOrder.value.push(this.processID);
+
+    const sortedProcessWindows = Object.entries(toValue(this.windows)).sort(
+      (a, b) => {
+        if ((a.minimizedAt ?? a.createdAt) > (b.minimizedAt ?? b.createdAt)) {
+          return 1;
+        }
+        if ((a.minimizedAt ?? a.createdAt) < (b.minimizedAt ?? b.createdAt)) {
+          return -1;
+        }
+        return 0;
+      },
+    );
+
+    // TODO every is true for empty collections
+    const allWindowsMinimized = sortedProcessWindows.every(
+      ([, window]) => window.minimizedAt > 0,
+    );
+
+    if (sortedProcessWindows.length > 0 && allWindowsMinimized) {
+      sortedProcessWindows.at(-1)[1].show();
+    } else {
+      windowOrder.value.forEach((windowID) => {
+        const window = windows.value[windowID];
+        if (
+          window.processID === this.processID &&
+          !window.minimizedAt &&
+          !window.hiddenAt
+        ) {
+          window.bringToFront();
+        }
+      });
+    }
+  }
+
+  registerEventListener(type, handler) {
+    this.eventHandlers[type] = handler;
+  }
+
+  dispatchEvent(type, args) {
+    this.eventHandlers[type]?.(args);
+  }
+
+  createWindow(component, options) {
+    return createWindow(this.processID, component, options);
+  }
+}
 
 export function useProcessManager() {
   const initializeApplications = async () => {
@@ -20,7 +102,7 @@ export function useProcessManager() {
 
     const pathLeader = "../manifests/applications/";
 
-    applicationIndex = Object.fromEntries(
+    applicationIndex.value = Object.fromEntries(
       Object.entries(manifests).map(([path, getManifest]) => {
         const applicationID = path
           .split(pathLeader)[1]
@@ -30,59 +112,51 @@ export function useProcessManager() {
     );
 
     console.log(
-      Object.keys(applicationIndex).length,
+      Object.keys(applicationIndex.value).length,
       "application(s) indexed",
-      applicationIndex,
+      applicationIndex.value,
     );
-  };
-
-  const removeFromOrder = (processID) => {
-    const processIndex = processOrder.value.indexOf(processID);
-    processOrder.value.splice(processIndex, 1);
   };
 
   const createProcess = (applicationID, name, icon) => {
-    const newID = crypto.randomUUID();
-    processes.value[newID] = {
-      applicationID,
-      name: name ?? "untitled",
-      icon: icon ?? "application",
-      createdAt: new Date().getTime(),
-      listeners: [], // Message listeners.
-    };
-    processOrder.value.push(newID);
+    const process = new Process(applicationID, name, icon);
 
     const doneCallback = (result) => {
-      console.log(`Process ${newID} exited with result`, result);
-      delete processes.value[newID];
+      console.log(`Process ${process.processID} exited with result`, result);
+      delete processes.value[process.processID];
     };
 
-    console.log("Process started with id", newID);
-    return [newID, doneCallback];
+    processes.value[process.processID] = process;
+    console.log("Process started with id", process.processID);
+    return [process, doneCallback];
   };
 
-  const startApplication = async (applicationID) => {
+  const startApplication = async (applicationID, path) => {
     // Check if application is already running
-    const existingProcess = Object.entries(processes.value).find(
+    const maybeProcess = Object.entries(processes.value).find(
       ([, process]) => process.applicationID === applicationID,
     );
 
-    if (existingProcess) {
-      console.log(
-        "Application already running",
-        existingProcess[0],
-        existingProcess[1],
-      );
-      // Send message to existing process...
-      return [];
+    if (maybeProcess) {
+      const [, process] = maybeProcess;
+      // console.warn("Application already running", processID, process);
+      process.bringToFront();
+
+      // Did path change?
+      if (path !== process.path && path !== undefined) {
+        console.log("Path changed", process.path, "->", path);
+        process.dispatchEvent("path", path);
+      }
+
+      return;
     }
 
     // Otherwise start new
-    const getManifest = applicationIndex[applicationID];
+    const getManifest = applicationIndex.value[applicationID];
 
     if (!getManifest) {
       console.error("Application", applicationID, "not found!");
-      return [];
+      return;
     }
 
     const manifest = (await getManifest()).default;
@@ -91,31 +165,27 @@ export function useProcessManager() {
     // So we have to return another promise here as an array if we want to wait on the application to close.
     return {
       done: new Promise((resolve) => {
-        const [newProcessID, newProcessResult] = createProcess(applicationID);
+        const [newProcess, newProcessResult] = createProcess(
+          applicationID,
+          manifest.name,
+          manifest.icon,
+        );
 
-        const registerMessageListener = (callback) => {
-          processes.value[newProcessID].listeners.push(callback);
+        const args = {
+          process: newProcess,
+          registerEventListener: (name, handler) =>
+            newProcess.registerEventListener(name, handler),
         };
 
-        window.sendMessage = (message) => {
-          processes.value[newProcessID].listeners.map((listener) => {
-            listener(message);
-          });
-        };
-
-        manifest.entry(newProcessID, registerMessageListener).then((result) => {
+        manifest.entry(args).then((result) => {
           newProcessResult(result);
-          removeFromOrder(newProcessID);
+          newProcess.stop();
           resolve();
         });
 
-        manifest.reEntry(newProcessID);
+        newProcess.dispatchEvent("path", path);
       }),
     };
-  };
-
-  const stopProcess = (processID) => {
-    openWindowsPerProcessID.value[processID].map((windowID) => close(windowID));
   };
 
   const activeProcess = computed(() => {
@@ -129,53 +199,14 @@ export function useProcessManager() {
     return processes.value[windows.value[firstVisibleWindowID].processID];
   });
 
-  const bringProcessToFront = (processID) => {
-    removeFromOrder(processID);
-    processOrder.value.push(processID);
-
-    const sortedWindowsForApplication = Object.entries(windows.value)
-      .filter(([, window]) => window.processID === processID)
-      .sort((a, b) => {
-        if ((a.minimizedAt ?? a.createdAt) > (b.minimizedAt ?? b.createdAt)) {
-          return 1;
-        }
-        if ((a.minimizedAt ?? a.createdAt) < (b.minimizedAt ?? b.createdAt)) {
-          return -1;
-        }
-        return 0;
-      });
-
-    // TODO every is true for empty collections
-    const allWindowsMinimized = sortedWindowsForApplication.every(
-      ([, window]) => window.minimizedAt > 0,
-    );
-
-    if (sortedWindowsForApplication.length > 0 && allWindowsMinimized) {
-      // TODO every is true for empty collections
-      sortedWindowsForApplication.at(-1)[1].show();
-    } else {
-      const windowIDswindowOrder = windowOrder.value.filter((windowID) => {
-        const window = windows.value[windowID];
-        return window.processID === processID;
-      });
-
-      windowIDswindowOrder.forEach((windowID) => {
-        const window = windows.value[windowID];
-        if (!window.minimizedAt && !window.hiddenAt) {
-          windows.value[windowID].show();
-        }
-      });
-    }
-  };
-
   return {
+    Process,
     initializeApplications,
     createProcess,
     startApplication,
-    stopProcess,
     processes,
     activeProcess,
-    bringProcessToFront,
     processOrder,
+    applicationIndex,
   };
 }

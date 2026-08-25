@@ -8,7 +8,7 @@ import { useProcessManager } from "../composables/processManager.js";
 import DockButton from "./dock/DockButton.vue";
 import IconContainer from "./IconContainer.vue";
 
-const { processes, bringProcessToFront } = useProcessManager();
+const { processes } = useProcessManager();
 const { windows } = useWindowManager();
 
 defineProps({
@@ -68,8 +68,8 @@ const parsedDockItems = computed(() =>
         <DockSeparator />
         <DockButton
           v-for="process in processes"
-          :key="process"
-          @click="bringProcessToFront(process)"
+          :key="process.processID"
+          @click="process.bringToFront()"
         >
           <IconContainer icon="file" />
         </DockButton>
