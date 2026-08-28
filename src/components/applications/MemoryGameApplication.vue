@@ -2,7 +2,7 @@
 import { onMounted, ref, nextTick } from "vue";
 import LargeIcon from "../LargeIcon.vue";
 import IconButton from "../IconButton.vue";
-import MagicWindow from "../MagicWindow.vue";
+import SiblingWindow from "../SiblingWindow.vue";
 
 const props = defineProps({
   window: {
@@ -120,12 +120,12 @@ const maybeNewGame = async () => {
     <div class="toolbar">
       <IconButton text="New game..." @click="maybeNewGame" />
       {{ newGameDialogOpen }}
-      <MagicWindow
+      <SiblingWindow
         v-model="newGameDialogOpen"
         :process-i-d="props.window.processID"
       >
         <div>Do you want to start a new game, really!? are you mad!?</div>
-      </MagicWindow>
+      </SiblingWindow>
     </div>
     <div class="grid" :style="{ '--cols': boardWidth }">
       <IconButton

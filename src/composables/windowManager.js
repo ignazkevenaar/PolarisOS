@@ -139,6 +139,16 @@ class Window {
 }
 
 export function useWindowManager() {
+  const registerWindow = (processID, options, parentWindowID) => {
+    const window = new Window(processID, undefined, options, parentWindowID);
+    windows.value[window.windowID] = window;
+
+    windowOrder.value.push(window.windowID);
+    window.bringToFront();
+
+    return window;
+  };
+
   const createWindow = (processID, component, options, parentWindowID) => {
     const window = new Window(processID, component, options, parentWindowID);
     windows.value[window.windowID] = window;
@@ -190,6 +200,7 @@ export function useWindowManager() {
     hiddenWindows,
     minimizedWindowIDs,
     processIDsWithOpenWindows,
+    registerWindow,
     createWindow,
     createOrSwitchToExistingWindow,
     openWindowsPerProcessID,
