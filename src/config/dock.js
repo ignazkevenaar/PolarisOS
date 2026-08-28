@@ -1,1 +1,5 @@
-export default ["documentApplication"];
+export default [
+  "polaris/explorer",
+  "documentApplication",
+  "polaris/anothertest",
+];

@@ -77,34 +77,53 @@ const selectItem = (item) => {
 </script>
 
 <template>
-  <div class="dockContainer">
-    <DockButton
-      v-for="application in pinnedDockItems"
-      :key="application.applicationID"
-      @click="startApplication(application.applicationID)"
-    >
-      <IconContainer :icon="application.icon"></IconContainer>
-      <span class="notRunning text-shadow" v-if="!application.running"
-        >...</span
+  <div class="container">
+    <div class="dockContainer pinned">
+      <DockButton
+        v-for="application in pinnedDockItems"
+        :key="application.applicationID"
+        @click="startApplication(application.applicationID)"
       >
-    </DockButton>
-  </div>
-  <div class="dockContainer">
-    <DockButton
-      v-for="(item, itemIndex) in dynamicDockItems"
-      :key="itemIndex"
-      @click="selectItem(item)"
-    >
-      <IconContainer :icon="item.icon ?? item.options?.icon"></IconContainer>
-    </DockButton>
-    <!-- {{ activeProcess }} -->
-    {{ processOrder.at(-1) }}
+        <IconContainer :icon="application.icon"></IconContainer>
+        <span class="notRunning text-shadow" v-if="!application.running"
+          >...</span
+        >
+      </DockButton>
+    </div>
+    <div class="dockContainer">
+      <DockButton
+        v-for="(item, itemIndex) in dynamicDockItems"
+        :key="itemIndex"
+        @click="selectItem(item)"
+      >
+        <IconContainer :icon="item.icon ?? item.options?.icon"></IconContainer>
+      </DockButton>
+      <div>
+        <!-- <pre>{{ windowOrder }}</pre> -->
+        <!-- <pre>{{ activeProcessID }}</pre> -->
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.container {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: 1fr auto;
+  width: 100%;
+  height: 100%;
+}
+
 .dockContainer {
   display: flex;
+  grid-row-start: 2;
+
+  &.pinned {
+    grid-row-start: 1;
+    grid-column-start: 2;
+    flex-direction: column;
+  }
 }
 
 .notRunning {
