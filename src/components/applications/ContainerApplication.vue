@@ -1,7 +1,6 @@
 <script setup>
 import { inject, ref } from "vue";
 import applications from "../../config/applications.js";
-import ApplicationWindow from "../ApplicationWindow.vue";
 import { useWindowManager } from "../../composables/windowManager.js";
 import IconContainer from "../IconContainer.vue";
 
@@ -33,39 +32,35 @@ const openOrSwitchApplication = (applicationID) => {
 const openBrowser = inject("openBrowser");
 </script>
 <template>
-  <ApplicationWindow>
-    <template #default="{ active }">
+  <div
+    class="color-container emboss grid"
+    :class="{ active }"
+    @click="selectedIndex = -1"
+  >
+    <template v-for="(item, index) in items" :key="index">
       <div
-        class="color-container emboss grid"
-        :class="{ active }"
-        @click="selectedIndex = -1"
+        class="iconContainer"
+        :class="{ selected: index === selectedIndex }"
+        @click.stop="selectedIndex = index"
+        @dblclick="openBrowser(item.href) ?? openOrSwitchApplication(item)"
       >
-        <template v-for="(item, index) in items" :key="index">
-          <div
-            class="iconContainer"
-            :class="{ selected: index === selectedIndex }"
-            @click.stop="selectedIndex = index"
-            @dblclick="openBrowser(item.href) ?? openOrSwitchApplication(item)"
-          >
-            <div :class="getSelectedClasses(index, selectedIndex, active)">
-              <IconContainer
-                v-if="item.icon ?? applications[item].icon"
-                :icon="item.icon ?? applications[item].icon"
-              />
-            </div>
-            <div
-              class="label"
-              :class="getSelectedClasses(index, selectedIndex, active)"
-            >
-              <span>
-                {{ item.name ?? applications[item].name }}
-              </span>
-            </div>
-          </div>
-        </template>
+        <div :class="getSelectedClasses(index, selectedIndex, active)">
+          <IconContainer
+            v-if="item.icon ?? applications[item].icon"
+            :icon="item.icon ?? applications[item].icon"
+          />
+        </div>
+        <div
+          class="label"
+          :class="getSelectedClasses(index, selectedIndex, active)"
+        >
+          <span>
+            {{ item.name ?? applications[item].name }}
+          </span>
+        </div>
       </div>
     </template>
-  </ApplicationWindow>
+  </div>
 </template>
 
 <style lang="css" scoped>

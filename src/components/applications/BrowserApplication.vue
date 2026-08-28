@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref, useTemplateRef, watch } from "vue";
-import ApplicationWindow from "../ApplicationWindow.vue";
 import StyledInput from "../StyledInput.vue";
 import bookmarks from "../../config/bookmarks.js";
 import IconButton from "../IconButton.vue";
@@ -128,6 +127,7 @@ const selectAll = (event) => {
   event.target.select();
 };
 
+// TODO: Provide window hooks
 const clearHistory = () => {
   window.history.pushState({}, "", `${baseURL}/`);
 };
@@ -146,72 +146,67 @@ onMounted(() => {
 });
 </script>
 <template>
-  <ApplicationWindow @close="clearHistory" ref="window">
-    <template #toolbar="{ active }">
-      <div class="toolbarContainer">
-        <div class="toolbar color-surface apply-color" :class="{ active }">
-          <IconButton
-            text="Back"
-            icon="back"
-            :disabled="iframeBackDepth === 0"
-            @click="navigateBack"
-          />
-          <IconButton
-            text="Forward"
-            icon="forward"
-            :disabled="iframeBackDepth >= iframeMaxDepth"
-            @click="navigateForward"
-          />
-          <IconButton text="Home" icon="home" @click="navigateHome" />
-          <StyledInput
-            v-model="browserLocation"
-            @keydown="handleLocationKeyDown"
-            @focus="selectAll"
-          />
-          <IconButton text="Go" icon="go" @click="navigateTo()" />
-          <IconButton
-            text="View"
-            icon="external"
-            @click="openCurrentPageInNewWindow"
-          />
-          <div class="throbberContainer bevel color-secondary">
-            <div
-              class="throbber emboss"
-              :class="{ on: throbberOn }"
-              @animationend="throbberOn = false"
-            >
-              <!-- Add some sick animated gif -->
-            </div>
+  <div class="container color-container emboss">
+    <div class="toolbarContainer">
+      <div class="toolbar color-surface apply-color" :class="{ active }">
+        <IconButton
+          text="Back"
+          icon="back"
+          :disabled="iframeBackDepth === 0"
+          @click="navigateBack"
+        />
+        <IconButton
+          text="Forward"
+          icon="forward"
+          :disabled="iframeBackDepth >= iframeMaxDepth"
+          @click="navigateForward"
+        />
+        <IconButton text="Home" icon="home" @click="navigateHome" />
+        <StyledInput
+          v-model="browserLocation"
+          @keydown="handleLocationKeyDown"
+          @focus="selectAll"
+        />
+        <IconButton text="Go" icon="go" @click="navigateTo()" />
+        <IconButton
+          text="View"
+          icon="external"
+          @click="openCurrentPageInNewWindow"
+        />
+        <div class="throbberContainer bevel color-secondary">
+          <div
+            class="throbber emboss"
+            :class="{ on: throbberOn }"
+            @animationend="throbberOn = false"
+          >
+            <!-- Add some sick animated gif -->
           </div>
         </div>
-
-        <div class="bookmarks bevel color-secondary" :class="{ active }">
-          <ul>
-            <li
-              v-for="(bookmark, bookmarkIndex) in bookmarks"
-              :key="bookmarkIndex"
-            >
-              <SmallIcon icon="bookmark" />
-              <a v-if="!bookmark.target" @click="navigateTo(bookmark.href)">{{
-                bookmark.text
-              }}</a>
-              <a v-else :href="bookmark.href" :target="bookmark.target">{{
-                bookmark.text
-              }}</a>
-            </li>
-          </ul>
-        </div>
       </div>
-    </template>
 
-    <div class="container color-container emboss">
-      <iframe
-        ref="iframeEl"
-        :src="`${urlScope}${props.initialURL}`"
-        @load="onNavigate"
-      ></iframe>
+      <div class="bookmarks bevel color-secondary" :class="{ active }">
+        <ul>
+          <li
+            v-for="(bookmark, bookmarkIndex) in bookmarks"
+            :key="bookmarkIndex"
+          >
+            <SmallIcon icon="bookmark" />
+            <a v-if="!bookmark.target" @click="navigateTo(bookmark.href)">{{
+              bookmark.text
+            }}</a>
+            <a v-else :href="bookmark.href" :target="bookmark.target">{{
+              bookmark.text
+            }}</a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </ApplicationWindow>
+    <iframe
+      ref="iframeEl"
+      :src="`${urlScope}${props.initialURL}`"
+      @load="onNavigate"
+    ></iframe>
+  </div>
 </template>
 
 <style lang="css" scoped>

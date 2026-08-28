@@ -13,6 +13,7 @@
 
 - Improve fallback routing
 - Rework window manager to be reparenting.
+- Migrate applications to manifests.
 
 ## 0.3.0 - 2026-07-16
 

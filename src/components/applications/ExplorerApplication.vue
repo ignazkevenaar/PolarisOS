@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
-import ApplicationWindow from "../ApplicationWindow.vue";
 import { useFilesystem } from "../../composables/filesystem.js";
 import ExplorerIcon from "./explorer/ExplorerIcon.vue";
 import MosaicArrow from "../mosaic/MosaicArrow.vue";
@@ -61,43 +60,41 @@ onMounted(() => {
 });
 </script>
 <template>
-  <ApplicationWindow title="Binbows Exploder">
-    <div class="container">
-      <div v-if="false">
-        <button @click="goToFolder(getFolderUp(path))">.. up</button>
-      </div>
-      <div class="iconCrumbs">
-        <template v-for="(fileOrFolder, index) in activeFolders" :key="index">
-          <ExplorerIcon
-            :fileOrFolder
-            @click="select(index, '')"
-            :name="selections[index - 1]"
-            :selected="index == activeFolders.length - 1"
-          />
-          <MosaicArrow v-if="index < activeFolders.length - 1" />
-        </template>
-      </div>
-
-      <div class="views">
-        <ExplorerViewIcons
-          v-if="false"
-          :folders="activeFolders"
-          :selections
-          @select="select"
-          @open="open"
-        />
-
-        <ExplorerViewColumns
-          v-if="true"
-          :folders="activeFolders"
-          :selections
-          @select="select"
-          @open="open"
-        />
-      </div>
-      <!-- {{ activeFolders.length }} -->
+  <div class="container">
+    <div v-if="false">
+      <button @click="goToFolder(getFolderUp(path))">.. up</button>
     </div>
-  </ApplicationWindow>
+    <div class="iconCrumbs">
+      <template v-for="(fileOrFolder, index) in activeFolders" :key="index">
+        <ExplorerIcon
+          :fileOrFolder
+          @click="select(index, '')"
+          :name="selections[index - 1]"
+          :selected="index == activeFolders.length - 1"
+        />
+        <MosaicArrow v-if="index < activeFolders.length - 1" />
+      </template>
+    </div>
+
+    <div class="views">
+      <ExplorerViewIcons
+        v-if="false"
+        :folders="activeFolders"
+        :selections
+        @select="select"
+        @open="open"
+      />
+
+      <ExplorerViewColumns
+        v-if="true"
+        :folders="activeFolders"
+        :selections
+        @select="select"
+        @open="open"
+      />
+    </div>
+    <!-- {{ activeFolders.length }} -->
+  </div>
 </template>
 
 <style scoped>

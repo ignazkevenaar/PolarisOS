@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch, toValue } from "vue";
-import ApplicationWindow from "../ApplicationWindow.vue";
 import eightBallResponses from "../../config/eightBallResponses.js";
 
 const baseURL = import.meta.env.BASE_URL;
@@ -61,30 +60,24 @@ const onDragEnd = () => {
 };
 </script>
 <template>
-  <ApplicationWindow
-    @drag-start="onDragStart"
-    @drag-move="onDragMove"
-    @drag-end="onDragEnd"
-  >
-    <div class="ball" @dblclick="generateResponse">
-      <Transition name="fade" mode="out-in">
-        <div
-          v-if="response"
-          :key="response"
-          class="triangle double"
-          :style="{
-            backgroundImage: `url('${baseURL}/img/applications/eight-ball/triangle.png')`,
-          }"
-        >
-          <span>{{ response }}</span>
-        </div>
-      </Transition>
-      <img
-        :src="`${baseURL}/img/applications/eight-ball/eight-ball.png`"
-        class="double"
-      />
-    </div>
-  </ApplicationWindow>
+  <div class="ball" @dblclick="generateResponse">
+    <Transition name="fade" mode="out-in">
+      <div
+        v-if="response"
+        :key="response"
+        class="triangle double"
+        :style="{
+          backgroundImage: `url('${baseURL}/img/applications/eight-ball/triangle.png')`,
+        }"
+      >
+        <span>{{ response }}</span>
+      </div>
+    </Transition>
+    <img
+      :src="`${baseURL}/img/applications/eight-ball/eight-ball.png`"
+      class="double"
+    />
+  </div>
 </template>
 
 <style lang="css" scoped>
@@ -114,31 +107,31 @@ const onDragEnd = () => {
 
   span {
     scale: 0;
-    color: #065ab5 !important;
     opacity: 0;
+    color: #065ab5 !important;
   }
 }
 
 .triangle {
-  width: 52px;
-  height: 45px;
+  display: grid;
   position: absolute;
   top: 39px;
   left: 39px;
-  display: grid;
   place-items: center;
+  width: 52px;
+  height: 45px;
 
   span {
     display: block;
-    width: min-content;
-    font-family: sans-serif;
-    font-size: 0.4rem;
-    color: white;
-    align-content: center;
-    text-align: center;
     position: relative;
     top: -6px;
+    align-content: center;
+    width: min-content;
     min-width: 25px;
+    color: white;
+    font-size: 0.4rem;
+    font-family: sans-serif;
+    text-align: center;
     text-shadow: 1px 1px 1px #1d2b53;
   }
 }

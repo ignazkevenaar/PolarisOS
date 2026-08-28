@@ -1,7 +1,10 @@
 <script setup>
 import { inject } from "vue";
-import ApplicationWindow from "../ApplicationWindow.vue";
 import LargeIcon from "../LargeIcon.vue";
+
+defineProps({
+  active: Boolean,
+});
 
 // eslint-disable-next-line no-undef
 const version = __APP_VERSION__;
@@ -11,9 +14,7 @@ const openBrowser = inject("openBrowser");
 const baseURL = import.meta.env.BASE_URL;
 </script>
 <template>
-  <ApplicationWindow v-slot="{ active }">
-    <!-- <template #content="{ active }">
-      <div class="content"> -->
+  <div class="container">
     <img
       :src="`${baseURL}/img/applications/about/splash.png`"
       alt="PolarisOS logo"
@@ -51,15 +52,15 @@ const baseURL = import.meta.env.BASE_URL;
         are mentioned in the about page.
       </p>
     </div>
-    <!-- </div>
-    </template> -->
-  </ApplicationWindow>
+  </div>
 </template>
 
 <style lang="css" scoped>
-.content {
+.container {
   --splash-width: 480px;
-
+  width: var(--splash-width);
+}
+.content {
   display: flex;
   flex-direction: column;
 

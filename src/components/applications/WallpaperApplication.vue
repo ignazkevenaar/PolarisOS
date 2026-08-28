@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref, useTemplateRef } from "vue";
-import ApplicationWindow from "../ApplicationWindow.vue";
 import { useSettings } from "../../composables/settings.js";
 import wallpapers from "../../config/wallpapers.js";
 import IconButton from "../IconButton.vue";
@@ -73,117 +72,113 @@ const handleFileUpload = (event) => {
 };
 </script>
 <template>
-  <ApplicationWindow>
-    <div class="windowContainer">
-      <div class="flex">
-        <div class="grid emboss color-container">
-          <!-- None-option -->
-          <IconButton
-            @click="setSetting('wallpaper', undefined)"
-            :class="
-              settings.wallpaper === undefined
-                ? ['color-tertiary', 'active']
-                : []
-            "
-          >
-            <div class="desktopColor" />
-          </IconButton>
-          <!-- Custom options -->
-          <IconButton
-            v-if="customWallpaper"
-            @click="setSetting('wallpaper', customWallpaper)"
-            :class="isCustomWallpaper ? ['color-tertiary', 'active'] : []"
-          >
-            <img :src="customWallpaper" />
-          </IconButton>
-
-          <IconButton
-            ref="buttons"
-            v-for="wallpaper in wallpapers"
-            :key="wallpaper.url ?? wallpaper"
-            @click="setSetting('wallpaper', wallpaper.url ?? wallpaper)"
-            :class="
-              (wallpaper.url ?? wallpaper) === settings.wallpaper
-                ? ['color-tertiary', 'active']
-                : []
-            "
-          >
-            <img
-              :src="`${baseURL}/img/wallpapers/${wallpaper.url ?? wallpaper}`"
-            />
-          </IconButton>
-        </div>
-      </div>
-
-      <div class="spaceBetween">
-        <div class="preview">
-          <div
-            class="monitor"
-            :style="{
-              background: `url('${baseURL}/img/applications/wallpapers/monitor.png')`,
-            }"
-          >
-            <div class="contents">
-              <Transition>
-                <div
-                  v-if="monitorOn"
-                  class="desktop"
-                  :style="wallpaperStyles"
-                ></div>
-              </Transition>
-            </div>
-            <div class="button" @click="monitorOn = !monitorOn"></div>
-            <div class="indicator" v-if="!monitorOn"></div>
-          </div>
-        </div>
-        <div class="setting">
-          <label>Wallpaper size</label>
-          <StyledSelect
-            :model-value="settings.wallpaperSize"
-            @update:model-value="setSetting('wallpaperSize', $event)"
-            :options="sizeOptions"
-          />
-        </div>
-        <div class="setting">
-          <label>Custom wallpaper</label>
-          <IconButton @click="pickFile">Browse...</IconButton>
-          <input
-            v-show="false"
-            ref="filePicker"
-            type="file"
-            accept="image/*"
-            @change="handleFileUpload"
-          />
-        </div>
-      </div>
-
-      <div class="attribution">
-        <template
-          v-for="wallpaper in [
-            wallpapers.find((w) => w.url === settings.wallpaper),
-          ]"
-          :key="wallpaper"
+  <div class="windowContainer">
+    <div class="flex">
+      <div class="grid emboss color-container">
+        <!-- None-option -->
+        <IconButton
+          @click="setSetting('wallpaper', undefined)"
+          :class="
+            settings.wallpaper === undefined ? ['color-tertiary', 'active'] : []
+          "
         >
-          <a v-if="wallpaper?.link" :href="wallpaper.link" target="_blank"
-            >Source</a
-          >
-          <p v-if="wallpaper?.attribution">
-            {{ wallpaper.attribution }}
-          </p>
-        </template>
+          <div class="desktopColor" />
+        </IconButton>
+        <!-- Custom options -->
+        <IconButton
+          v-if="customWallpaper"
+          @click="setSetting('wallpaper', customWallpaper)"
+          :class="isCustomWallpaper ? ['color-tertiary', 'active'] : []"
+        >
+          <img :src="customWallpaper" />
+        </IconButton>
+
+        <IconButton
+          ref="buttons"
+          v-for="wallpaper in wallpapers"
+          :key="wallpaper.url ?? wallpaper"
+          @click="setSetting('wallpaper', wallpaper.url ?? wallpaper)"
+          :class="
+            (wallpaper.url ?? wallpaper) === settings.wallpaper
+              ? ['color-tertiary', 'active']
+              : []
+          "
+        >
+          <img
+            :src="`${baseURL}/img/wallpapers/${wallpaper.url ?? wallpaper}`"
+          />
+        </IconButton>
       </div>
     </div>
-  </ApplicationWindow>
+
+    <div class="spaceBetween">
+      <div class="preview">
+        <div
+          class="monitor"
+          :style="{
+            background: `url('${baseURL}/img/applications/wallpapers/monitor.png')`,
+          }"
+        >
+          <div class="contents">
+            <Transition>
+              <div
+                v-if="monitorOn"
+                class="desktop"
+                :style="wallpaperStyles"
+              ></div>
+            </Transition>
+          </div>
+          <div class="button" @click="monitorOn = !monitorOn"></div>
+          <div class="indicator" v-if="!monitorOn"></div>
+        </div>
+      </div>
+      <div class="setting">
+        <label>Wallpaper size</label>
+        <StyledSelect
+          :model-value="settings.wallpaperSize"
+          @update:model-value="setSetting('wallpaperSize', $event)"
+          :options="sizeOptions"
+        />
+      </div>
+      <div class="setting">
+        <label>Custom wallpaper</label>
+        <IconButton @click="pickFile">Browse...</IconButton>
+        <input
+          v-show="false"
+          ref="filePicker"
+          type="file"
+          accept="image/*"
+          @change="handleFileUpload"
+        />
+      </div>
+    </div>
+
+    <div class="attribution">
+      <template
+        v-for="wallpaper in [
+          wallpapers.find((w) => w.url === settings.wallpaper),
+        ]"
+        :key="wallpaper"
+      >
+        <a v-if="wallpaper?.link" :href="wallpaper.link" target="_blank"
+          >Source</a
+        >
+        <p v-if="wallpaper?.attribution">
+          {{ wallpaper.attribution }}
+        </p>
+      </template>
+    </div>
+  </div>
 </template>
 
 <style lang="css" scoped>
 .windowContainer {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: 4fr 3fr;
+  gap: 8px;
   padding: 16px;
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 4fr 3fr;
-  grid-template-rows: 1fr auto;
-  gap: 8px;
 }
 
 .flex {
@@ -200,9 +195,9 @@ const handleFileUpload = (event) => {
   overflow: auto;
 
   button {
-    padding: 0;
     display: grid;
     place-items: center;
+    padding: 0;
 
     img {
       pointer-events: none;
@@ -211,11 +206,11 @@ const handleFileUpload = (event) => {
 
   img,
   .desktopColor {
+    border: 1px solid black;
+    background-color: rgb(var(--color-desktop));
     width: 64px;
     height: 64px;
-    border: 1px solid black;
     object-fit: contain;
-    background-color: rgb(var(--color-desktop));
   }
 
   .space {
@@ -224,8 +219,8 @@ const handleFileUpload = (event) => {
 }
 
 .attribution {
-  margin-top: 1em;
   grid-column: span 2;
+  margin-top: 1em;
 
   p {
     margin: 0;
@@ -248,27 +243,27 @@ const handleFileUpload = (event) => {
   margin-bottom: 8px;
 
   .monitor {
+    display: grid;
     position: relative;
+    place-items: center;
     width: 176px;
     height: 164px;
-    display: grid;
-    place-items: center;
 
     .contents {
+      position: relative;
+      top: -10px;
+      box-sizing: border-box;
       border: 1px solid black;
       border-radius: 3px;
       width: 144px;
       height: 119px;
-      box-sizing: border-box;
-      position: relative;
-      top: -10px;
       overflow: hidden;
     }
 
     .desktop {
+      will-change: transform, filter;
       width: 100%;
       height: 100%;
-      will-change: transform, filter;
     }
 
     .button,
@@ -277,19 +272,19 @@ const handleFileUpload = (event) => {
     }
 
     .button {
+      right: 20px;
+      bottom: 8px;
+      cursor: pointer;
       width: 20px;
       height: 14px;
-      bottom: 8px;
-      right: 20px;
-      cursor: pointer;
     }
 
     .indicator {
+      right: 46px;
+      bottom: 15px;
+      background-color: black;
       width: 5px;
       height: 1px;
-      bottom: 15px;
-      right: 46px;
-      background-color: black;
     }
   }
 }
@@ -308,8 +303,8 @@ const handleFileUpload = (event) => {
 }
 
 .v-enter-from {
-  filter: brightness(0) contrast(2) blur(3px);
   scale: 110%;
+  filter: brightness(0) contrast(2) blur(3px);
 }
 
 .v-leave-active {

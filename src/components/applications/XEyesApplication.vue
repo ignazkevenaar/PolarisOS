@@ -1,6 +1,5 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from "vue";
-import ApplicationWindow from "../ApplicationWindow.vue";
 
 const eyes = ref([]);
 const pupilCoordinates = ref([
@@ -47,19 +46,17 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <ApplicationWindow>
-    <div class="eyeContainer">
-      <div class="eye" ref="eyes" v-for="i in 2" :key="i">
-        <div
-          class="pupil"
-          :style="{
-            left: `${pupilCoordinates[i - 1].x}px`,
-            top: `${pupilCoordinates[i - 1].y}px`,
-          }"
-        ></div>
-      </div>
+  <div class="eyeContainer">
+    <div class="eye" ref="eyes" v-for="i in 2" :key="i">
+      <div
+        class="pupil"
+        :style="{
+          left: `${pupilCoordinates[i - 1].x}px`,
+          top: `${pupilCoordinates[i - 1].y}px`,
+        }"
+      ></div>
     </div>
-  </ApplicationWindow>
+  </div>
 </template>
 
 <style lang="css" scoped>
@@ -73,19 +70,19 @@ onBeforeUnmount(() => {
 }
 
 .eye {
+  position: relative;
+  box-sizing: border-box;
   border: 4px solid black;
+  background: white;
   width: 96px;
   height: 156px;
-  background: white;
-  position: relative;
   overflow: hidden;
-  box-sizing: border-box;
 
   .pupil {
+    position: relative;
+    background-color: black;
     width: 32px;
     height: 48px;
-    background-color: black;
-    position: relative;
   }
 }
 </style>

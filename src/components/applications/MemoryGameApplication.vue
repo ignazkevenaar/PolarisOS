@@ -1,13 +1,15 @@
 <script setup>
 import { onMounted, ref, nextTick } from "vue";
-import ApplicationWindow from "../ApplicationWindow.vue";
 import LargeIcon from "../LargeIcon.vue";
 import IconButton from "../IconButton.vue";
-import DialogWindow from "../DialogWindow.vue";
-import { useWindowManager } from "../../composables/windowManager.js";
-import ApplicationGhost from "../ApplicationGhost.vue";
+import MagicWindow from "../MagicWindow.vue";
 
-const { createOrSwitchToExistingWindow } = useWindowManager();
+const props = defineProps({
+  window: {
+    type: Object,
+    required: true,
+  },
+});
 
 const iconNames = [
   "clock",
@@ -108,33 +110,22 @@ const tryCell = async (index) => {
 };
 
 const newGameDialogOpen = ref(false);
-const testDialog = ref(undefined);
-const dialogWindow = ref(undefined);
 
 const maybeNewGame = async () => {
   newGameDialogOpen.value = true;
-
-  await nextTick();
-  console.log(testDialog.value);
-
-  const window = createOrSwitchToExistingWindow(
-    "com.memory.newgame",
-    /*DialogWindow*/ undefined,
-    {
-      text: "werkt dit?",
-    },
-  );
-
-  dialogWindow.value = window;
 };
 </script>
 <template>
-  <ApplicationWindow>
+  <div class="container">
     <div class="toolbar">
       <IconButton text="New game..." @click="maybeNewGame" />
-      <ApplicationGhost :window="dialogWindow" v-if="newGameDialogOpen">
+      {{ newGameDialogOpen }}
+      <MagicWindow
+        v-model="newGameDialogOpen"
+        :process-i-d="props.window.processID"
+      >
         <div>Do you want to start a new game, really!? are you mad!?</div>
-      </ApplicationGhost>
+      </MagicWindow>
     </div>
     <div class="grid" :style="{ '--cols': boardWidth }">
       <IconButton
@@ -158,14 +149,20 @@ const maybeNewGame = async () => {
         ></LargeIcon>
       </IconButton>
     </div>
-  </ApplicationWindow>
+  </div>
 </template>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   grid-auto-rows: 1fr;
+  flex: 1;
   place-items: stretch;
 }
 
