@@ -6,6 +6,7 @@ import applications from "../config/applications.js";
 import { useSettings } from "../composables/settings.js";
 import { useWallpaper } from "../composables/wallpaper.js";
 import { useProcessManager } from "../composables/processManager.js";
+import WindowHost from "./WindowHost.vue";
 
 const { settings } = useSettings();
 const { wallpaperStyles } = useWallpaper();
@@ -24,14 +25,7 @@ const props = defineProps({
 const desktopElement = useTemplateRef("desktop");
 provide("desktopElement", desktopElement);
 
-const {
-  windows,
-  windowOrder,
-  hiddenWindows,
-  minimizedWindowIDs,
-  createOrSwitchToExistingWindow,
-  focusedWindowID,
-} = useWindowManager();
+const { createOrSwitchToExistingWindow } = useWindowManager();
 
 const openBrowser = (URL) => {
   if (!URL) return;
@@ -90,26 +84,7 @@ const version = __APP_VERSION__;
     ref="desktop"
   >
     <p class="evaluation">Evaluation copy. Version {{ version }}</p>
-    <template v-for="(window, windowID) in windows" :key="windowID">
-      <Component
-        :is="window.component"
-        :hidden="
-          minimizedWindowIDs.has(windowID) || hiddenWindows.has(windowID)
-        "
-        :window="window"
-        :x="window.x"
-        :y="window.y"
-        v-bind="window.options"
-        :active="focusedWindowID === windowID"
-        :z-index="windowOrder.indexOf(windowID) + 1"
-        @focus="window.bringToFront()"
-        @drag-move="window.move($event.x, $event.y)"
-        @drag-end="window.move($event.x, $event.y)"
-        @resize="window.resize($event.width, $event.height)"
-        @close="window.close()"
-        @minimize="window.minimize()"
-      ></Component>
-    </template>
+    <WindowHost />
     <NewApplicationDock />
   </div>
 </template>
