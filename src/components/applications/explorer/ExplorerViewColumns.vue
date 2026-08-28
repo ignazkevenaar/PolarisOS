@@ -3,26 +3,33 @@ import { ref, watch, nextTick } from "vue";
 import ExplorerColumn from "./ExplorerColumn.vue";
 
 const props = defineProps({
-  folders: {
+  chain: {
     type: Array,
     default: () => [],
   },
-  selections: {
+  openPath: {
     type: Array,
     default: () => [],
+  },
+  selectedKey: {
+    type: String,
+    default: null,
+  },
+  columnWidth: {
+    type: Number,
+    default: 0,
   },
 });
 
-const emit = defineEmits(["open", "select"]);
+const emit = defineEmits(["activate"]);
 
 const columns = ref(undefined);
 
 watch(
-  () => props.folders,
+  () => props.chain,
   async () => {
     await nextTick();
-    const lastColumn = columns.value?.at(-1).$el;
-    lastColumn?.scrollIntoView();
+    columns.value?.at(-1)?.$el?.scrollIntoView();
   },
 );
 </script>
@@ -30,13 +37,13 @@ watch(
 <template>
   <div class="columns">
     <ExplorerColumn
-      v-for="(folder, folderIndex) in folders"
-      :key="folderIndex"
+      v-for="(folder, depth) in chain"
+      :key="depth"
       ref="columns"
       :folder="folder"
-      :model-value="selections[folderIndex]"
-      @update:model-value="emit('select', folderIndex, $event)"
-      @open="emit('open', folderIndex, $event)"
+      :activeKey="depth < openPath.length ? openPath[depth] : selectedKey"
+      :style="{ width: `${columnWidth}px`, flexBasis: `${columnWidth}px` }"
+      @activate="(key, item, open) => emit('activate', depth, key, item, open)"
     />
   </div>
 </template>
@@ -50,8 +57,7 @@ watch(
   overflow-x: auto;
 
   > * {
-    flex: 0 0 200px;
-    width: 200px;
+    flex: 0;
   }
 }
 </style>

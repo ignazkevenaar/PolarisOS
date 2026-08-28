@@ -1,24 +1,32 @@
 <script setup>
-import { ref, toValue, watch } from "vue";
+import { ref, toValue, watch, inject } from "vue";
 import MosaicArrow from "../../mosaic/MosaicArrow.vue";
-const model = defineModel({ type: String });
-const emit = defineEmits(["open"]);
+
+const emit = defineEmits(["activate"]);
 
 const props = defineProps({
   folder: {
     type: Object,
     default: () => ({}),
   },
+  // Key of the item to highlight in this column: either the next-level
+  // folder that's already open, or the current selection in this column.
+  activeKey: {
+    type: String,
+    default: null,
+  },
 });
 
-// Might wanna share this between the views...
-// <FolderContents :folder="folder" v-slot="{contents}"></FolderContents>
 const folderItems = ref(undefined);
+const active = inject("windowActive");
 
 watch(
   () => props.folder,
   async (newFolder) => {
-    if (newFolder === undefined) return;
+    if (newFolder === undefined || newFolder.type !== "folder") {
+      folderItems.value = undefined;
+      return;
+    }
     const folderContents = toValue(await newFolder.contents);
     folderItems.value = folderContents;
   },
@@ -28,13 +36,23 @@ watch(
 
 <template>
   <div class="column emboss">
-    <ul @click="model = ''">
+    <!-- Clicking the background deselects and closes any columns downstream. -->
+    <ul @click="emit('activate')">
       <li v-for="(item, key) in folderItems" :key>
         <button
           class="reserve-space"
-          :class="{ 'bevel color-tertiary active': model === key }"
-          @click.prevent.stop="model = key"
-          @dblclick.prevent="item.type !== 'folder' && emit('open', key)"
+          :class="{
+            'bevel color-tertiary': activeKey === key,
+            active: activeKey === key && active,
+          }"
+          @click.prevent.stop="
+            emit('activate', key, item, item.type === 'folder')
+          "
+          @dblclick.prevent.stop="
+            item.type !== 'folder'
+              ? emit('activate', key, item, true)
+              : undefined
+          "
         >
           <span>
             {{ item.name ?? key }}
@@ -65,7 +83,8 @@ ul {
     align-items: center;
     gap: 8px;
     appearance: none;
-    padding: 2px 8px;
+    border-inline-width: 0;
+    padding: 2px 4px;
     width: 100%;
 
     &:not(.active) {

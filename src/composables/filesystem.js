@@ -63,12 +63,10 @@ export function useFilesystem() {
     const outputFolders = [reactiveFilesystem.value];
     let reference = await reactiveFilesystem.value.contents;
 
-    if (parts.length === 1 && parts[0] === "") {
-      return outputFolders;
-    }
-
     try {
-      for (const part of parts) {
+      for (const [partIndex, part] of parts.entries()) {
+        if (part === "" && partIndex === 0) continue; // Skip
+
         const fileOrFolder = reference?.[part];
 
         if (fileOrFolder === undefined) {
@@ -76,11 +74,9 @@ export function useFilesystem() {
           throw new Error();
         }
 
-        if (part == parts.at(-1)) {
-          outputFolders.push(fileOrFolder);
-          break;
-        } else if (fileOrFolder.type === "folder") {
-          outputFolders.push(fileOrFolder);
+        outputFolders.push(fileOrFolder);
+
+        if (partIndex < parts.length - 1) {
           reference = toValue(await fileOrFolder.contents); // Unwrap reactive elements
         }
       }

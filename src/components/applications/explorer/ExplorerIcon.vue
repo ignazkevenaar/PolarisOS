@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import IconContainer from "../../IconContainer.vue";
 import { useFilesystem } from "../../../composables/filesystem.js";
+import { computed, inject } from "vue";
 
-defineProps({
+const props = defineProps({
   fileOrFolder: {
     type: Object,
   },
@@ -15,23 +16,22 @@ defineProps({
 });
 
 const { iconMap } = useFilesystem();
+const active = inject("windowActive");
+
+const selectedClasses = computed(() => ({
+  "apply-color color-tertiary": props.selected,
+  active: active.value && props.selected,
+}));
 </script>
 
 <template>
   <div class="iconContainer">
-    <div
-      class="selectable icon"
-      :class="selected ? 'apply-color color-tertiary active' : ''"
-    >
+    <div class="selectable icon" :class="selectedClasses">
       <IconContainer :icon="fileOrFolder.icon ?? iconMap[fileOrFolder.type]" />
     </div>
-    <label
-      class="selectable"
-      :class="selected ? 'apply-color color-tertiary active' : ''"
-      >{{
-        name || fileOrFolder.name || fileOrFolder.part || fileOrFolder.type
-      }}</label
-    >
+    <label class="selectable" :class="selectedClasses">{{
+      name || fileOrFolder.name || fileOrFolder.part || fileOrFolder.type
+    }}</label>
   </div>
 </template>
 

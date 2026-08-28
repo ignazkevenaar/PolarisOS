@@ -8,8 +8,7 @@ export default {
     waitForAllWindows(process.processID, () => {
       process.createWindow(
         defineAsyncComponent(
-          () =>
-            import("../../../components/applications/ExplorerApplication.vue"),
+          () => import("@/components/applications/ExplorerApplication.vue"),
         ),
         { title: "File Explorer", icon: "folder", width: 640, height: 360 },
       );

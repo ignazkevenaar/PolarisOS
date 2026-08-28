@@ -3,33 +3,30 @@ import { ref, watch, toValue, computed } from "vue";
 import ExplorerIcon from "./ExplorerIcon.vue";
 
 const props = defineProps({
-  folders: {
+  chain: {
     type: Array,
     default: () => [],
   },
-  selections: {
-    type: Array,
-    default: () => [],
+  selectedKey: {
+    type: String,
+    default: null,
   },
 });
 
-const emit = defineEmits(["open", "select"]);
+const emit = defineEmits(["activate"]);
 
-const folder = computed(() =>
-  props.folders?.filter((item) => item.type === "folder").at(-1),
-);
-const lastFolderIndex = computed(() => props.folders.length - 1);
-
+// This view only shows the deepest open folder, not the selected item.
+const depth = computed(() => props.chain.length - 1);
 const folderItems = ref(undefined);
-const localSelection = ref(undefined);
-const select = (key) => (localSelection.value = key);
 
 watch(
-  folder,
-  async (newFolder) => {
-    if (newFolder === undefined) return;
-    const folderContents = toValue(await newFolder.contents);
-    folderItems.value = folderContents;
+  () => props.chain.at(-1),
+  async (folder) => {
+    if (folder === undefined || folder.type !== "folder") {
+      folderItems.value = undefined;
+      return;
+    }
+    folderItems.value = toValue(await folder.contents);
   },
   { immediate: true },
 );
@@ -38,18 +35,16 @@ watch(
 <template>
   <div
     class="grid color-container emboss"
-    @click.stop="localSelection = undefined"
+    @click.stop="emit('activate', depth)"
   >
     <ExplorerIcon
       v-for="(item, key) in folderItems"
       :key
       :fileOrFolder="item"
-      :selected="localSelection === key"
-      :name="key"
-      @click.prevent.stop="select(key)"
-      @dblclick.prevent="
-        emit(item.type === 'folder' ? 'select' : 'open', lastFolderIndex, key)
-      "
+      :selected="selectedKey === key"
+      :name="item.name ?? key"
+      @click.prevent.stop="emit('activate', depth, key, item)"
+      @dblclick.prevent="emit('activate', depth, key, item, true)"
     />
   </div>
 </template>
@@ -61,5 +56,6 @@ watch(
   grid-auto-rows: 128px;
   gap: 8px;
   padding: 16px;
+  overflow: auto;
 }
 </style>

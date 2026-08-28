@@ -7,6 +7,8 @@ import {
   onMounted,
   useTemplateRef,
   nextTick,
+  provide,
+  toRef,
 } from "vue";
 import { useDraggable, useResizeObserver } from "@vueuse/core";
 import { useWindowEffects } from "../composables/windowEffects";
@@ -224,6 +226,8 @@ const waitAndRepaint = async () => {
   await nextTick();
   repaintWindow();
 };
+
+provide("windowActive", toRef(props, "active"));
 </script>
 
 <template>

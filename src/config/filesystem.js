@@ -1,4 +1,4 @@
-import { ref, computed, defineAsyncComponent } from "vue";
+import { ref, computed, defineAsyncComponent, markRaw } from "vue";
 
 const counter = ref(0);
 const increaseCounter = () => counter.value++;
@@ -9,8 +9,10 @@ export default {
   name: "Computer",
   icon: "computer",
   contents: {
-    someFile: {
+    "test text file": {
       type: "file",
+      extension: "txt",
+      contents: "Hello World!",
     },
     someFolder: {
       type: "folder",
@@ -30,21 +32,13 @@ export default {
               name: "random folder that happens to have a very long annoying name",
               type: "folder",
               icon: {
-                component: defineAsyncComponent(
-                  async () => import("../components/icons/ClockIcon.vue"),
+                component: markRaw(
+                  defineAsyncComponent(
+                    async () => import("../components/icons/ClockIcon.vue"),
+                  ),
                 ),
               },
-              async contents() {
-                const result = {};
-                for (let i = 0; i < 10; i++) {
-                  const rand = Math.random();
-                  result[rand] = {
-                    type: "file",
-                    name: rand,
-                  };
-                }
-                return result;
-              },
+              contents: {},
             },
             computedFolder: {
               type: "folder",
