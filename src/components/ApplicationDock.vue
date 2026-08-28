@@ -69,7 +69,7 @@ const parsedDockItems = computed(() =>
         <DockButton
           v-for="process in processes"
           :key="process.processID"
-          @click="process.bringToFront()"
+          @click="process.bringWindowsToFront()"
         >
           <IconContainer icon="file" />
         </DockButton>

@@ -7,9 +7,14 @@ import IconContainer from "./IconContainer.vue";
 
 import dock from "../config/dock.js";
 
-const { Process, processes, processOrder, startApplication, applicationIndex } =
-  useProcessManager();
-const { windows } = useWindowManager();
+const {
+  Process,
+  processes,
+  startApplication,
+  applicationIndex,
+  activeProcessID,
+} = useProcessManager();
+const { windows, windowOrder } = useWindowManager();
 
 const pinnedDockItems = ref([]);
 watch(
@@ -64,7 +69,7 @@ const dynamicDockItems = computed(() => {
 
 const selectItem = (item) => {
   if (item instanceof Process) {
-    item.bringToFront();
+    item.bringWindowsToFront();
   } else {
     item.show();
   }

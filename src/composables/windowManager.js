@@ -29,6 +29,14 @@ const maybeDecreaseTiling = (window) => {
   }
 };
 
+const focusLastWindow = () => {
+  const lastWindowID = windowOrder.value.findLast((windowID) => {
+    const window = windows.value[windowID];
+    return !window.minimizedAt && !window.hiddenAt;
+  });
+  focusedWindowID.value = lastWindowID;
+};
+
 class Window {
   constructor(processID, component, options, parentWindowID) {
     this.processID = processID;
@@ -102,11 +110,13 @@ class Window {
     );
     this.minimizedAt = new Date().getTime();
     minimizedWindowIDs.value.add(this.windowID);
+    focusLastWindow();
   }
 
   hide() {
     this.hiddenAt = new Date().getTime();
     hiddenWindows.value.add(this.windowID);
+    focusLastWindow();
   }
 
   show() {
@@ -121,9 +131,11 @@ class Window {
   close() {
     maybeDecreaseTiling(window);
 
-    delete windows.value[this.windowID];
     const focusIndex = windowOrder.value.indexOf(this.windowID);
     windowOrder.value.splice(focusIndex, 1);
+    focusLastWindow();
+
+    delete windows.value[this.windowID];
   }
 
   changeTitle(title) {

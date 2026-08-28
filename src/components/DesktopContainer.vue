@@ -133,10 +133,9 @@ body {
 .evaluation {
   position: absolute;
   margin: 4px;
-  inset: 0;
+  inset: 10px;
   color: white;
   font-family: monospace;
-  text-align: right;
   text-shadow: 0 1px 0 black;
 }
 </style>

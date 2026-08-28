@@ -1,4 +1,4 @@
-import { ref, computed, toValue } from "vue";
+import { ref, computed, toValue, toRaw } from "vue";
 import { useWindowManager } from "./windowManager";
 
 const processes = ref({});
@@ -12,6 +12,7 @@ const {
   openWindowsPerProcessID,
   unfocusActiveWindow,
   createWindow,
+  focusedWindowID,
 } = useWindowManager();
 
 class Process {
@@ -26,7 +27,7 @@ class Process {
     this.windows = computed(() =>
       Object.fromEntries(
         Object.entries(windows.value).filter(
-          ([, window]) => window.processID === this.processid,
+          ([, window]) => window.processID === this.processID,
         ),
       ),
     );
@@ -40,10 +41,13 @@ class Process {
 
   bringToFront() {
     unfocusActiveWindow();
-
     const processIndex = processOrder.value.indexOf(this.processID);
     processOrder.value.splice(processIndex, 1);
     processOrder.value.push(this.processID);
+  }
+
+  bringWindowsToFront() {
+    this.bringToFront();
 
     const sortedProcessWindows = Object.entries(toValue(this.windows)).sort(
       (a, b) => {
@@ -65,7 +69,8 @@ class Process {
     if (sortedProcessWindows.length > 0 && allWindowsMinimized) {
       sortedProcessWindows.at(-1)[1].show();
     } else {
-      windowOrder.value.forEach((windowID) => {
+      // Clone because bringToFront modifies collection.
+      structuredClone(toRaw(windowOrder.value)).map((windowID) => {
         const window = windows.value[windowID];
         if (
           window.processID === this.processID &&
@@ -140,7 +145,7 @@ export function useProcessManager() {
     if (maybeProcess) {
       const [, process] = maybeProcess;
       // console.warn("Application already running", processID, process);
-      process.bringToFront();
+      process.bringWindowsToFront();
 
       // Did path change?
       if (path !== process.path && path !== undefined) {
@@ -182,22 +187,18 @@ export function useProcessManager() {
           newProcess.stop();
           resolve();
         });
-
+        processOrder.value.push(newProcess.processID);
         newProcess.dispatchEvent("path", path);
+        newProcess.bringWindowsToFront();
       }),
     };
   };
 
-  const activeProcess = computed(() => {
-    const firstVisibleWindowID = windowOrder.value.findLast((windowID) => {
-      const window = windows.value[windowID];
-      return !window.hiddenAt && !window.minimizedAt;
-    });
-
-    if (!firstVisibleWindowID) return undefined;
-
-    return processes.value[windows.value[firstVisibleWindowID].processID];
-  });
+  const activeProcessID = computed(
+    () =>
+      windows.value[focusedWindowID.value]?.processID ??
+      processOrder.value.at(-1),
+  );
 
   return {
     Process,
@@ -205,8 +206,7 @@ export function useProcessManager() {
     createProcess,
     startApplication,
     processes,
-    activeProcess,
-    processOrder,
+    activeProcessID,
     applicationIndex,
   };
 }

@@ -1,9 +1,21 @@
 <script setup>
-import { ref, computed, watch, inject, onMounted, useTemplateRef } from "vue";
+import {
+  ref,
+  computed,
+  watch,
+  inject,
+  onMounted,
+  useTemplateRef,
+  nextTick,
+} from "vue";
 import { useDraggable, useResizeObserver } from "@vueuse/core";
 import { useWindowEffects } from "../composables/windowEffects";
 
 const props = defineProps({
+  window: {
+    type: Object,
+    required: true,
+  },
   x: {
     type: Number,
     default: 0,
@@ -13,20 +25,12 @@ const props = defineProps({
     default: 0,
   },
   width: {
-    type: [Number, String],
-    default: "auto",
+    type: Number,
+    default: undefined,
   },
   height: {
-    type: [Number, String],
-    default: "auto",
-  },
-  contentWidth: {
-    type: [Number, String],
-    default: "auto",
-  },
-  contentHeight: {
-    type: [Number, String],
-    default: "auto",
+    type: Number,
+    default: undefined,
   },
   center: {
     type: Boolean,
@@ -83,16 +87,18 @@ const emit = defineEmits([
   "dragEnd",
 ]);
 
+const windowContent = useTemplateRef("windowContent");
+
 const {
   prefersReducedMotion,
   lowestZIndex,
   repaintWindow,
   paintDesktopColor,
   showingDesktopColor,
-} = useWindowEffects(useTemplateRef("windowContent"));
+} = useWindowEffects(windowContent);
 
 const desktopElement = inject("desktopElement");
-const windowElement = useTemplateRef("window");
+const windowElement = useTemplateRef("windowElement");
 const titleBarHandleElement = useTemplateRef("handle");
 const dragDirectly = computed(
   () => prefersReducedMotion.value || props.dragDirectly,
@@ -135,8 +141,6 @@ const { style } = useDraggable(windowElement, {
   },
 });
 
-const maybeConvertStyleToPX = (val) => (isNaN(val) ? val : `${val}px`);
-
 const getActualWindowDimensions = () => {
   const rect = windowElement.value.getBoundingClientRect();
   return {
@@ -146,27 +150,30 @@ const getActualWindowDimensions = () => {
 };
 
 const windowStyles = computed(() => ({
-  left: maybeConvertStyleToPX(props.x),
-  top: maybeConvertStyleToPX(props.y),
-  width: maybeConvertStyleToPX(props.width),
-  height: maybeConvertStyleToPX(props.height),
+  left: `${props.x}px`,
+  top: `${props.y}px`,
   zIndex: props.alwaysOnTop ? 100 : lowestZIndex.value ? -100 : props.zIndex,
 }));
 
-const contentStyles = computed(() => ({
-  width: isNaN(props.contentWidth)
-    ? props.contentWidth
-    : `${props.contentWidth}px`,
-  height: isNaN(props.contentHeight)
-    ? props.contentHeight
-    : `${props.contentHeight}px`,
-}));
+onMounted(async () => {
+  // Calculate how much the window dimensions differ from the content
+  // dimensions to be able to correctly calculate the content width.
+  const windowRect = windowElement.value.getBoundingClientRect();
+  const windowContentRect = windowContent.value.getBoundingClientRect();
+  const dW = windowRect.width - windowContentRect.width;
+  const dH = windowRect.height - windowContentRect.height;
 
-onMounted(() => {
+  if (props.width !== undefined) {
+    windowElement.value.style.width = `${props.width + dW}px`;
+  }
+
+  if (props.height !== undefined) {
+    windowElement.value.style.height = `${props.height + dH}px`;
+  }
+
   if (props.resizable) {
-    useResizeObserver(windowElement, (entries) => {
-      if (!entries[0].target.checkVisibility()) return; // Don't set width when element is not visible.
-      const entry = entries[0];
+    useResizeObserver(windowContent, ([entry]) => {
+      if (!entry.target.checkVisibility()) return; // Don't set width when element is not visible.
       const { width, height } = entry.contentRect;
       emit("resize", { width, height });
     });
@@ -201,7 +208,6 @@ const onClose = async () => {
 };
 
 const onMinimize = async () => {
-  // Offender
   await paintDesktopColor();
   emit("minimize");
 };
@@ -213,13 +219,18 @@ watch(
     if (!newHidden) repaintWindow();
   },
 );
+
+const waitAndRepaint = async () => {
+  await nextTick();
+  repaintWindow();
+};
 </script>
 
 <template>
   <div
     v-show="!hidden"
-    ref="window"
-    :style="[windowStyles]"
+    ref="windowElement"
+    :style="windowStyles"
     @pointerdown="emit('focus')"
     class="windowWrapper"
     :class="{
@@ -261,16 +272,18 @@ watch(
             <span class="glyph bevel"></span>
           </button>
         </div>
-        <slot name="toolbar" :active></slot>
         <div
           ref="windowContent"
           class="content"
           :class="transparent ? [] : ['color-surface', 'bevel']"
-          :style="contentStyles"
         >
-          <slot :active :close="onClose"></slot>
+          <slot
+            :window
+            :active
+            :close="onClose"
+            :repaint="waitAndRepaint"
+          ></slot>
         </div>
-        <slot name="content" :active :close="onClose"></slot>
       </div>
     </div>
 
@@ -429,10 +442,6 @@ watch(
     position: relative;
     flex: 1 1 auto;
     overflow: auto;
-
-    &:empty {
-      display: none;
-    }
   }
 }
 
