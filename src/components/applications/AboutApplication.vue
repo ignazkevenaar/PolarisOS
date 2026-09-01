@@ -1,6 +1,8 @@
 <script setup>
-import { inject } from "vue";
 import LargeIcon from "../LargeIcon.vue";
+import { useBrowser } from "../../composables/browser.js";
+
+const { openLink } = useBrowser();
 
 defineProps({
   active: Boolean,
@@ -10,7 +12,6 @@ defineProps({
 const version = __APP_VERSION__;
 const currentYear = new Date().getFullYear();
 
-const openBrowser = inject("openBrowser");
 const baseURL = import.meta.env.BASE_URL;
 </script>
 <template>
@@ -39,7 +40,9 @@ const baseURL = import.meta.env.BASE_URL;
             <tr>
               <td>More info and credits:</td>
               <td>
-                <a href="#" @click="openBrowser('index')">About PolarisOS</a>
+                <a href="#" @click="openLink('about-polaris')"
+                  >About PolarisOS</a
+                >
               </td>
             </tr>
           </tbody>

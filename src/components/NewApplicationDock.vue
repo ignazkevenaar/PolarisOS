@@ -7,14 +7,9 @@ import IconContainer from "./IconContainer.vue";
 
 import dock from "../config/dock.js";
 
-const {
-  Process,
-  processes,
-  startApplication,
-  applicationIndex,
-  activeProcessID,
-} = useProcessManager();
-const { windows, windowOrder } = useWindowManager();
+const { Process, processes, startApplication, applicationIndex } =
+  useProcessManager();
+const { windows } = useWindowManager();
 
 const pinnedDockItems = ref([]);
 watch(
@@ -22,20 +17,17 @@ watch(
   async () => {
     pinnedDockItems.value = [];
     for (const applicationID of dock) {
-      const fetcher = applicationIndex.value[applicationID];
-      if (!fetcher) continue;
-      // I don't like having to fetch the manifest at all...
-      const result = (await fetcher()).default;
-      result.applicationID = applicationID; // TODO
-      result.running = computed(() =>
+      const manifest = applicationIndex.value[applicationID];
+      if (!manifest) continue;
+      manifest.running = computed(() =>
         Object.values(processes.value).some(
           (process) => process.applicationID === applicationID,
         ),
       );
-      pinnedDockItems.value.push(result);
+      pinnedDockItems.value.push(manifest);
     }
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 
 const dynamicDockItems = computed(() => {

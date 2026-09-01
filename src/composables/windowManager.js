@@ -21,14 +21,6 @@ const incrementAndgetOffset = () => {
   ];
 };
 
-const maybeDecreaseTiling = (window) => {
-  // Decrement this counter to allow new window to be opened at a lesser tiling level
-  if (window.isAtOriginalPosition) {
-    window.isAtOriginalPosition = false;
-    tilingWindowCount = Math.max(tilingWindowCount - 1, 0);
-  }
-};
-
 const focusLastWindow = () => {
   const lastWindowID = windowOrder.value.findLast((windowID) => {
     const window = windows.value[windowID];
@@ -37,8 +29,8 @@ const focusLastWindow = () => {
   focusedWindowID.value = lastWindowID;
 };
 
-class Window {
-  constructor(processID, component, options, parentWindowID) {
+export class Window {
+  constructor(processID, component, options, passedProps, parentWindowID) {
     this.processID = processID;
     this.component = component ? markRaw(component) : undefined;
     this.parentWindowID = parentWindowID;
@@ -48,11 +40,20 @@ class Window {
     this.x = x;
     this.y = y;
     this.isAtOriginalPosition = true;
-    this.options = options; // TODO: ensure to handle these options
+    this.options = options;
+    this.passedProps = passedProps ?? {};
+  }
+
+  maybeDecreaseTiling() {
+    // Decrement this counter to allow new window to be opened at a lesser tiling level
+    if (this.isAtOriginalPosition) {
+      this.isAtOriginalPosition = false;
+      tilingWindowCount = Math.max(tilingWindowCount - 1, 0);
+    }
   }
 
   move(x, y) {
-    maybeDecreaseTiling(window);
+    this.maybeDecreaseTiling();
     this.x = x;
     this.y = y;
   }
@@ -129,8 +130,7 @@ class Window {
   }
 
   close() {
-    maybeDecreaseTiling(window);
-
+    this.maybeDecreaseTiling();
     const focusIndex = windowOrder.value.indexOf(this.windowID);
     windowOrder.value.splice(focusIndex, 1);
     focusLastWindow();
@@ -139,7 +139,7 @@ class Window {
   }
 
   changeTitle(title) {
-    this.title = title;
+    this.options.title = title;
   }
 
   getChildWindows() {

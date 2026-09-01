@@ -16,6 +16,7 @@ const {
     <ApplicationWindow
       v-if="window.component"
       :window="window"
+      :title="window.title"
       :x="window.x"
       :y="window.y"
       :width="window.width"
@@ -23,6 +24,7 @@ const {
       :hidden="minimizedWindowIDs.has(windowID) || hiddenWindows.has(windowID)"
       :active="focusedWindowID === windowID"
       :z-index="windowOrder.indexOf(windowID) + 1"
+      :passed-props="window.passedProps"
       v-bind="window.options"
       @focus="window.bringToFront()"
       @drag-move="window.move($event.x, $event.y)"

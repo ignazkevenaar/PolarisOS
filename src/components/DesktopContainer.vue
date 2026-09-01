@@ -1,16 +1,16 @@
 <script setup>
 import { onMounted, provide, useTemplateRef } from "vue";
 import NewApplicationDock from "./NewApplicationDock.vue";
-import { useWindowManager } from "../composables/windowManager.js";
-import applications from "../config/applications.js";
 import { useSettings } from "../composables/settings.js";
 import { useWallpaper } from "../composables/wallpaper.js";
 import { useProcessManager } from "../composables/processManager.js";
 import WindowHost from "./WindowHost.vue";
+import { useBrowser } from "../composables/browser.js";
 
 const { settings } = useSettings();
 const { wallpaperStyles } = useWallpaper();
-const { initializeApplications, startApplication } = useProcessManager();
+const { initializeApplications } = useProcessManager();
+const { openLink } = useBrowser();
 
 const props = defineProps({
   initialURL: {
@@ -25,31 +25,8 @@ const props = defineProps({
 const desktopElement = useTemplateRef("desktop");
 provide("desktopElement", desktopElement);
 
-const { createOrSwitchToExistingWindow } = useWindowManager();
-
-const openBrowser = (URL) => {
-  if (!URL) return;
-
-  const browserApplication = applications.browser;
-  createOrSwitchToExistingWindow(
-    browserApplication.name,
-    browserApplication.component,
-    {
-      ...browserApplication,
-      initialURL: URL,
-    },
-  );
-
-  return true;
-};
-provide("openBrowser", openBrowser);
-
 onMounted(async () => {
   await initializeApplications();
-
-  window.withPath = () => {
-    startApplication("documentApplication", "somePath");
-  };
 
   // Prevent recursive loading in <iframe>
   if (window !== window.top) return;
@@ -69,7 +46,7 @@ onMounted(async () => {
     return;
   }
 
-  openBrowser(path);
+  openLink(path);
 });
 
 // eslint-disable-next-line no-undef

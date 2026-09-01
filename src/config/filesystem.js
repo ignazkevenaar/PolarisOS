@@ -1,64 +1,55 @@
-import { ref, computed, defineAsyncComponent, markRaw } from "vue";
+import { useProcessManager } from "../composables/processManager";
 
-const counter = ref(0);
-const increaseCounter = () => counter.value++;
-window.i = increaseCounter;
+const { applicationIndex, getApplicationManifest } = useProcessManager();
 
 export default {
   type: "folder",
   name: "Computer",
   icon: "computer",
   contents: {
-    "test text file": {
-      type: "file",
-      extension: "txt",
-      contents: "Hello World!",
-    },
-    someFolder: {
+    Apps: {
       type: "folder",
-      contents: {
-        anotherFile: {
-          type: "file",
-        },
+      contents: async () => {
+        const result = {};
+        for (const applicationID of Object.keys(applicationIndex.value)) {
+          const applicationManifest =
+            await getApplicationManifest(applicationID);
+
+          result[applicationID] = {
+            type: "application",
+            name: applicationManifest.name,
+            icon: applicationManifest.icon,
+          };
+        }
+        return result;
       },
     },
-    this: {
+    Utilities: {
       type: "folder",
+      contents: async () => {
+        const result = {};
+        // for (const [applicationID, applicationLoader] of Object.entries(
+        //   applicationIndex.value,
+        // )) {
+        //   const applicationManifest = (await applicationLoader()).default;
+
+        //   result[applicationID] = {
+        //     type: "application",
+        //     name: applicationManifest.name,
+        //     icon: applicationManifest.icon,
+        //   };
+        // }
+        return result;
+      },
+    },
+    Me: {
+      type: "folder",
+      icon: "home",
       contents: {
-        is: {
-          type: "folder",
-          contents: {
-            randomFolder: {
-              name: "random folder that happens to have a very long annoying name",
-              type: "folder",
-              icon: {
-                component: markRaw(
-                  defineAsyncComponent(
-                    async () => import("../components/icons/ClockIcon.vue"),
-                  ),
-                ),
-              },
-              contents: {},
-            },
-            computedFolder: {
-              type: "folder",
-              contents: computed(() => ({
-                counter: {
-                  type: "file",
-                  contents: counter.value * 10,
-                },
-              })),
-            },
-            refFolder: {
-              type: "folder",
-              contents: {
-                ref: {
-                  type: "file",
-                  contents: counter,
-                },
-              },
-            },
-          },
+        "about me": {
+          type: "file",
+          extension: "link",
+          content: "aboutme/",
         },
       },
     },

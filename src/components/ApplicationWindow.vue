@@ -48,7 +48,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: "Untitled",
+    default: undefined,
   },
   resizable: {
     type: Boolean,
@@ -76,6 +76,11 @@ const props = defineProps({
   hidden: {
     type: Boolean,
     default: false,
+  },
+  passedProps: {
+    // Passed to inner component
+    type: Object,
+    default: () => {},
   },
 });
 
@@ -286,6 +291,7 @@ provide("windowActive", toRef(props, "active"));
             :active
             :close="onClose"
             :repaint="waitAndRepaint"
+            v-bind="passedProps"
           ></slot>
         </div>
       </div>

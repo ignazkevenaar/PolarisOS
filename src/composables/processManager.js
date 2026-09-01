@@ -5,6 +5,7 @@ const processes = ref({});
 const processOrder = ref([]);
 
 let applicationIndex = ref({});
+let fileAssociations = ref({});
 
 const {
   windows,
@@ -44,12 +45,13 @@ class Process {
     const processIndex = processOrder.value.indexOf(this.processID);
     processOrder.value.splice(processIndex, 1);
     processOrder.value.push(this.processID);
+    this.dispatchEvent("bringToFront");
   }
 
   bringWindowsToFront() {
     this.bringToFront();
 
-    const sortedProcessWindows = Object.entries(toValue(this.windows)).sort(
+    const sortedProcessWindows = Object.values(toValue(this.windows)).sort(
       (a, b) => {
         if ((a.minimizedAt ?? a.createdAt) > (b.minimizedAt ?? b.createdAt)) {
           return 1;
@@ -63,11 +65,11 @@ class Process {
 
     // TODO every is true for empty collections
     const allWindowsMinimized = sortedProcessWindows.every(
-      ([, window]) => window.minimizedAt > 0,
+      (window) => window.minimizedAt > 0,
     );
 
     if (sortedProcessWindows.length > 0 && allWindowsMinimized) {
-      sortedProcessWindows.at(-1)[1].show();
+      sortedProcessWindows.at(-1).show();
     } else {
       // Clone because bringToFront modifies collection.
       structuredClone(toRaw(windowOrder.value)).map((windowID) => {
@@ -91,8 +93,8 @@ class Process {
     this.eventHandlers[type]?.(args);
   }
 
-  createWindow(component, options) {
-    return createWindow(this.processID, component, options);
+  createWindow(component, options, passedProps) {
+    return createWindow(this.processID, component, options, passedProps);
   }
 }
 
@@ -107,20 +109,58 @@ export function useProcessManager() {
 
     const pathLeader = "../manifests/applications/";
 
-    applicationIndex.value = Object.fromEntries(
-      Object.entries(manifests).map(([path, getManifest]) => {
-        const applicationID = path
-          .split(pathLeader)[1]
-          .split(".manifest.js")[0];
-        return [applicationID, getManifest];
-      }),
-    );
+    const transformed = [];
+    for (const [path, getManifest] of Object.entries(manifests)) {
+      const applicationID = path.split(pathLeader)[1].split(".manifest.js")[0];
+      const manifest = (await getManifest()).default;
+      manifest.applicationID = applicationID;
+
+      if (manifest.fileAssociations) {
+        const supportedTypes = manifest.fileAssociations;
+        supportedTypes.forEach((fileType) => {
+          if (fileType in fileAssociations.value) {
+            console.warn("Duplicate file association, skipping", applicationID);
+          }
+          fileAssociations.value[fileType] = applicationID;
+        });
+      }
+
+      transformed.push([applicationID, manifest]);
+    }
+    applicationIndex.value = Object.fromEntries(transformed);
 
     console.log(
       Object.keys(applicationIndex.value).length,
       "application(s) indexed",
       applicationIndex.value,
+      "with the following file associations",
+      fileAssociations.value,
     );
+  };
+
+  const getApplicationManifest = (applicationID) => {
+    if (!(applicationID in applicationIndex.value)) {
+      console.error("Invalid applicationID");
+      return;
+    }
+    return applicationIndex.value[applicationID];
+  };
+
+  const openFile = async (fileName, file) => {
+    // Get type
+    if (file.type === "application") {
+      console.log("Starting application", fileName, file);
+      await startApplication(fileName);
+    } else {
+      const targetApplicationID = fileAssociations.value[file.extension];
+      if (targetApplicationID) {
+        const path = file.content;
+        console.log("going to open with application", targetApplicationID);
+        const process = await startApplication(targetApplicationID, path);
+        console.log(process);
+        // Post path.
+      }
+    }
   };
 
   const createProcess = (applicationID, name, icon) => {
@@ -144,40 +184,38 @@ export function useProcessManager() {
 
     if (maybeProcess) {
       const [, process] = maybeProcess;
-      // console.warn("Application already running", processID, process);
       process.bringWindowsToFront();
 
-      // Did path change?
       if (path !== process.path && path !== undefined) {
         console.log("Path changed", process.path, "->", path);
         process.dispatchEvent("path", path);
       }
 
-      return;
+      return { process };
     }
 
     // Otherwise start new
-    const getManifest = applicationIndex.value[applicationID];
+    const manifest = applicationIndex.value[applicationID];
 
-    if (!getManifest) {
+    if (!manifest) {
       console.error("Application", applicationID, "not found!");
       return;
     }
 
-    const manifest = (await getManifest()).default;
+    const [newProcess, newProcessResult] = createProcess(
+      applicationID,
+      manifest.name,
+      manifest.icon,
+    );
 
     // Bit strange, but this is a function that should be able to wait on two parts
     // So we have to return another promise here as an array if we want to wait on the application to close.
     return {
+      process: newProcess,
       done: new Promise((resolve) => {
-        const [newProcess, newProcessResult] = createProcess(
-          applicationID,
-          manifest.name,
-          manifest.icon,
-        );
-
         const args = {
           process: newProcess,
+          path,
           registerEventListener: (name, handler) =>
             newProcess.registerEventListener(name, handler),
         };
@@ -188,7 +226,6 @@ export function useProcessManager() {
           resolve();
         });
         processOrder.value.push(newProcess.processID);
-        newProcess.dispatchEvent("path", path);
         newProcess.bringWindowsToFront();
       }),
     };
@@ -203,6 +240,8 @@ export function useProcessManager() {
   return {
     Process,
     initializeApplications,
+    getApplicationManifest,
+    openFile,
     createProcess,
     startApplication,
     processes,

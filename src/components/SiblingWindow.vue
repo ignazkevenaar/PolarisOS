@@ -41,6 +41,7 @@ watch(model, (newModel) => {
     <ApplicationWindow
       v-if="window && model"
       :window="window"
+      :title="window.title"
       :x="window.x"
       :y="window.y"
       :width="window.width"
@@ -51,6 +52,7 @@ watch(model, (newModel) => {
       "
       :active="focusedWindowID === currentWindowID"
       :z-index="windowOrder.indexOf(currentWindowID) + 1"
+      :passed-props="window.passedProps"
       v-bind="window.options"
       @focus="window.bringToFront()"
       @drag-move="window.move($event.x, $event.y)"
@@ -58,9 +60,9 @@ watch(model, (newModel) => {
       @resize="window.resize($event.width, $event.height)"
       @close="model = false"
       @minimize="window.minimize()"
-      v-slot="props"
+      v-slot="{ repaint, ...props }"
     >
-      <slot v-bind="props"></slot>
+      <slot v-bind="props" @vue:mounted="repaint()"></slot>
     </ApplicationWindow>
   </Teleport>
 </template>

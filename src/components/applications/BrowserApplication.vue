@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, useTemplateRef, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from "vue";
 import StyledInput from "../StyledInput.vue";
 import bookmarks from "../../config/bookmarks.js";
 import IconButton from "../IconButton.vue";
@@ -7,6 +7,7 @@ import bubbleIframePointerEvents from "../../utils/bubbleIframePointerEvents.js"
 import { injectStyles } from "../../config/injectStyles.js";
 import { useSettings } from "../../composables/settings.js";
 import SmallIcon from "../SmallIcon.vue";
+import { Window } from "../../composables/windowManager.js";
 
 const { settings } = useSettings();
 
@@ -14,6 +15,10 @@ const props = defineProps({
   window: {
     type: Window,
     required: true,
+  },
+  active: {
+    type: Boolean,
+    default: false,
   },
   initialURL: { type: String, default: undefined },
 });
@@ -46,7 +51,7 @@ const handleMessage = (event) => {
   console.log("Message!", event);
 };
 
-const onNavigate = (event) => {
+const onNavigate = async (event) => {
   const contentWindow = event.target.contentWindow;
   frameContentWindow.value = contentWindow;
 
@@ -85,7 +90,10 @@ const onNavigate = (event) => {
   browserLocation.value = currentURL.value;
   props.window?.changeTitle(`${contentWindow.document.title} — Browser`);
 
-  injectStyles(windowElement.value.$el, contentWindow.document.documentElement);
+  await injectStyles(
+    windowElement.value,
+    contentWindow.document.documentElement,
+  );
   bubbleIframePointerEvents(event.target);
 
   throbberOn.value = true;
@@ -132,11 +140,13 @@ const clearHistory = () => {
   window.history.pushState({}, "", `${baseURL}/`);
 };
 
-watch([() => settings.value.theme, () => settings.value.font], () => {
-  console.log("watcher fires");
+onBeforeUnmount(() => {
+  clearHistory();
+});
 
+watch([() => settings.value.theme, () => settings.value.font], () => {
   injectStyles(
-    windowElement.value.$el,
+    windowElement.value,
     frameContentWindow.value.document.documentElement,
   );
 });
@@ -146,7 +156,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="container color-container emboss">
+  <div ref="window" class="container">
     <div class="toolbarContainer">
       <div class="toolbar color-surface apply-color" :class="{ active }">
         <IconButton
@@ -213,9 +223,9 @@ onMounted(() => {
 .container {
   display: grid;
   position: relative;
+  grid-template-rows: auto 1fr;
   place-items: stretch;
   place-self: stretch;
-  margin: 6px;
 
   iframe {
     border: none;

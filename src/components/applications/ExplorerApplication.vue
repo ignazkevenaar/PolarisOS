@@ -6,8 +6,10 @@ import MosaicArrow from "../mosaic/MosaicArrow.vue";
 import ExplorerViewColumns from "./explorer/ExplorerViewColumns.vue";
 import ExplorerViewIcons from "./explorer/ExplorerViewIcons.vue";
 import IconButton from "../IconButton.vue";
+import { useProcessManager } from "../../composables/processManager.js";
 
 const { getFile } = useFilesystem();
+const { openFile } = useProcessManager();
 
 const viewMode = ref("columns");
 // Used for column view columns and icon breadcrumbs to make them align.
@@ -57,7 +59,7 @@ const breadcrumbItems = computed(() => [
   ...(selectedItem.value ? [selectedItem.value] : []),
 ]);
 
-const activate = (depth, key, item, open) => {
+const activate = async (depth, key, item, open) => {
   openPath.value = openPath.value.slice(0, depth);
 
   if (key === undefined) {
@@ -70,8 +72,10 @@ const activate = (depth, key, item, open) => {
       openPath.value = [...openPath.value, key];
       selectedKey.value = null;
     } else {
-      console.log("Opening file!", key);
       selectedKey.value = key;
+
+      console.log("Opening file!", key, item);
+      openFile(key, item);
     }
   } else {
     selectedKey.value = key;

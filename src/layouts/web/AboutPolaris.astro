@@ -4,12 +4,17 @@ import Layout from "../Layout.astro";
 import Footer from "../../components/web/footer.astro";
 import "../../assets/web/fonts.css";
 import "../../assets/web/teleport.css";
+const baseURL = import.meta.env.BASE_URL;
 ---
 
 <Layout {frontmatter}>
   <header class="hero">
-    <img src="img/minisplash-logo.png" alt="PolarisOS" />
-    <img src="img/minisplash-right.png" alt="" aria-hidden="true" />
+    <img src={`${baseURL}/web/img/minisplash-logo.png`} alt="PolarisOS" />
+    <img
+      src={`${baseURL}/web/img/minisplash-right.png`}
+      alt=""
+      aria-hidden="true"
+    />
   </header>
 
   <nav>
@@ -21,7 +26,7 @@ import "../../assets/web/teleport.css";
           .map((heading) => (
             <li class={`depth-${heading.depth}`}>
               <a href={"#" + heading.slug}>
-                <img src="img/bullet.png" alt="" />
+                <img src={`${baseURL}/web/img/bullet.png`} alt="" />
                 {heading.text}
               </a>
             </li>
@@ -57,23 +62,23 @@ import "../../assets/web/teleport.css";
   }
 
   header {
-    grid-area: header;
-    height: var(--header-height);
-    background-color: black;
     display: flex;
+    grid-area: header;
     justify-content: space-between;
+    background-color: black;
+    height: var(--header-height);
   }
 
   nav {
-    grid-area: nav;
     top: var(--header-height);
-    height: calc(100vh - var(--header-height) - 32px);
+    grid-area: nav;
     padding: 16px;
+    height: calc(100vh - var(--header-height) - 32px);
 
     ul {
-      list-style: none;
-      padding: 0;
       margin: 0;
+      padding: 0;
+      list-style: none;
 
       li {
         &.depth-3 {
@@ -89,8 +94,8 @@ import "../../assets/web/teleport.css";
 
   article {
     grid-area: article;
-    overflow: auto;
     padding: 16px;
+    overflow: auto;
     scroll-padding-block: 16px;
 
     h1 {

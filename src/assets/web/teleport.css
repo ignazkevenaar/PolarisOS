@@ -1,11 +1,11 @@
 html {
-  font-size: var(--font-size);
-  font-family: var(--font-family);
   scrollbar-color: rgb(var(--color-tertiary-active))
     rgb(var(--color-surface-active));
+  font-size: var(--font-size);
+  font-family: var(--font-family);
 
-  /* ::selection {
+  ::selection {
     background-color: rgb(var(--color-tertiary-active));
     color: contrast-color(rgb(var(--color-tertiary-active)));
-  } */
+  }
 }
