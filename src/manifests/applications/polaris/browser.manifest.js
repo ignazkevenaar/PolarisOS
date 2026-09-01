@@ -21,8 +21,7 @@ export default {
     const createWindow = (initialURL) => {
       windowID = process.createWindow(
         defineAsyncComponent(
-          () =>
-            import("../../../components/applications/BrowserApplication.vue"),
+          () => import("@/components/applications/BrowserApplication.vue"),
         ),
         {
           title: "Browser",

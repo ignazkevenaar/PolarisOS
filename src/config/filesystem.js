@@ -11,7 +11,10 @@ export default {
       type: "folder",
       contents: async () => {
         const result = {};
-        for (const applicationID of Object.keys(applicationIndex.value)) {
+        const filteredApps = Object.keys(applicationIndex.value).filter(
+          (path) => !path.startsWith("polaris/utilities/"),
+        );
+        for (const applicationID of filteredApps) {
           const applicationManifest =
             await getApplicationManifest(applicationID);
 
@@ -28,17 +31,19 @@ export default {
       type: "folder",
       contents: async () => {
         const result = {};
-        // for (const [applicationID, applicationLoader] of Object.entries(
-        //   applicationIndex.value,
-        // )) {
-        //   const applicationManifest = (await applicationLoader()).default;
+        const filteredApps = Object.keys(applicationIndex.value).filter(
+          (path) => path.startsWith("polaris/utilities/"),
+        );
+        for (const applicationID of filteredApps) {
+          const applicationManifest =
+            await getApplicationManifest(applicationID);
 
-        //   result[applicationID] = {
-        //     type: "application",
-        //     name: applicationManifest.name,
-        //     icon: applicationManifest.icon,
-        //   };
-        // }
+          result[applicationID] = {
+            type: "application",
+            name: applicationManifest.name,
+            icon: applicationManifest.icon,
+          };
+        }
         return result;
       },
     },

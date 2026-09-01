@@ -32,12 +32,12 @@ const {
       @resize="window.resize($event.width, $event.height)"
       @close="window.close()"
       @minimize="window.minimize()"
-      v-slot="{ repaint, ...props }"
+      v-slot="{ childMounted, ...props }"
     >
       <Component
         :is="window.component"
         v-bind="props"
-        @vue:mounted="repaint()"
+        @vue:mounted="childMounted()"
       ></Component>
     </ApplicationWindow>
   </template>

@@ -160,6 +160,7 @@ const windowStyles = computed(() => ({
   left: `${props.x}px`,
   top: `${props.y}px`,
   zIndex: props.alwaysOnTop ? 100 : lowestZIndex.value ? -100 : props.zIndex,
+  opacity: loading.value ? 0 : 1, // Hide with opacity so you can still calculate dimensions.
 }));
 
 onMounted(async () => {
@@ -184,15 +185,6 @@ onMounted(async () => {
       const { width, height } = entry.contentRect;
       emit("resize", { width, height });
     });
-  }
-
-  if (props.center) {
-    const { width: wW, height: wH } =
-      windowElement.value.getBoundingClientRect();
-    const { width: dW, height: dH } =
-      desktopElement.value.getBoundingClientRect();
-
-    emit("dragMove", { x: (dW - wW) / 2, y: (dH - wH) / 2 });
   }
 
   watch(
@@ -227,8 +219,21 @@ watch(
   },
 );
 
-const waitAndRepaint = async () => {
+const loading = ref(true);
+const onChildMounted = async () => {
   await nextTick();
+
+  if (props.center) {
+    const { width: wW, height: wH } =
+      windowElement.value.getBoundingClientRect();
+    const { width: dW, height: dH } =
+      desktopElement.value.getBoundingClientRect();
+
+    emit("dragMove", { x: (dW - wW) / 2, y: (dH - wH) / 2 });
+  }
+
+  // Actually show window.
+  loading.value = false;
   repaintWindow();
 };
 
@@ -290,7 +295,7 @@ provide("windowActive", toRef(props, "active"));
             :window
             :active
             :close="onClose"
-            :repaint="waitAndRepaint"
+            :childMounted="onChildMounted"
             v-bind="passedProps"
           ></slot>
         </div>

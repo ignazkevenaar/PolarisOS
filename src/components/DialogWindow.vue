@@ -1,5 +1,4 @@
 <script setup>
-import ApplicationWindow from "./ApplicationWindow.vue";
 import LargeIcon from "./LargeIcon.vue";
 
 defineProps({
@@ -7,22 +6,21 @@ defineProps({
     type: String,
     default: "",
   },
+  close: {
+    type: Function,
+  },
 });
 </script>
 <template>
-  <ApplicationWindow>
-    <template #default="{ close }">
-      <div class="container">
-        <div class="content">
-          <LargeIcon icon="warning" />
-          <p>{{ text }}</p>
-        </div>
-        <div class="toolbar">
-          <slot name="buttons" :close="close" />
-        </div>
-      </div>
-    </template>
-  </ApplicationWindow>
+  <div class="container">
+    <div class="content">
+      <LargeIcon icon="warning" />
+      <p>{{ text }}</p>
+    </div>
+    <div class="toolbar">
+      <slot name="buttons" :close="close" />
+    </div>
+  </div>
 </template>
 
 <style lang="css" scoped>

@@ -1,6 +1,15 @@
 <script setup>
-import { ref, watch, toValue } from "vue";
+import { computed, ref, watch } from "vue";
+import { watchThrottled } from "@vueuse/core";
+import { Window } from "../../composables/windowManager.js";
 import eightBallResponses from "../../config/eightBallResponses.js";
+
+const props = defineProps({
+  window: {
+    type: Window,
+    required: true,
+  },
+});
 
 const baseURL = import.meta.env.BASE_URL;
 
@@ -13,51 +22,52 @@ const generateResponse = () => {
   response.value = eightBallResponses[randomIndex];
 };
 
-const windowShaken = ref(false);
-let dragDeltaToBeAdded = 0;
-let lastPosition;
-let dragDeltaInterval;
-const dragAcceleration = ref(0);
-watch(dragAcceleration, (newAmount, oldAmount) => {
-  if (!windowShaken.value && newAmount > oldAmount && newAmount >= 600) {
-    windowShaken.value = true;
-    generateResponse();
+// Throttled watcher populates a list of old positions.
+// Those list entries clear themselves with the inner timeout.
+// We calculate the absolute average movement over all old positions.
+// If that average is rising and higher than a magic number threshold,
+// generate a new response!
+
+const oldPositions = ref([]);
+let windowShaken = false;
+
+watchThrottled(
+  () => [props.window.x, props.window.y],
+  (position) => {
+    oldPositions.value.push(position);
+    // Difference between interval and timeout is max
+    // amount of recorded positions to average.
+    setTimeout(() => {
+      oldPositions.value.shift();
+    }, 550);
+  },
+  { throttle: 20 },
+);
+
+const averageMovement = computed(() => {
+  if (oldPositions.value.length < 2) return 0;
+
+  let average = 0;
+  let previous = oldPositions.value[0];
+  for (let i = 1; i < oldPositions.value.length; i++) {
+    const current = oldPositions.value[i];
+    average +=
+      Math.abs(current[0] - previous[0]) + Math.abs(current[1] - previous[1]);
+    previous = current;
   }
 
-  if (dragDeltaInterval && newAmount === 0) {
-    clearInterval(dragDeltaInterval);
-    dragDeltaInterval = undefined;
-    windowShaken.value = false;
-  }
+  return average / oldPositions.value.length;
 });
 
-const onDragStart = (position) => {
-  dragAcceleration.value = 0;
-  dragDeltaToBeAdded = 0;
-  lastPosition = toValue(position);
-  windowShaken.value = false;
-
-  dragDeltaInterval = setInterval(() => {
-    let newAmount = dragAcceleration.value + dragDeltaToBeAdded - 25;
-    newAmount = Math.max(newAmount, 0);
-    dragAcceleration.value = newAmount;
-    dragDeltaToBeAdded = 0;
-  }, 10);
-};
-
-const onDragMove = (position) => {
-  const rawPosition = toValue(position);
-
-  const delta =
-    Math.abs(rawPosition.x - lastPosition.x) +
-    Math.abs(rawPosition.y - lastPosition.y);
-  dragDeltaToBeAdded = delta;
-  lastPosition = toValue(position);
-};
-
-const onDragEnd = () => {
-  lastPosition = undefined;
-};
+watch(averageMovement, (movement, oldMovement) => {
+  const threshold = 75;
+  if (!windowShaken && movement >= threshold && movement > oldMovement) {
+    windowShaken = true;
+    generateResponse();
+  } else if (movement < threshold && movement <= oldMovement) {
+    windowShaken = false;
+  }
+});
 </script>
 <template>
   <div class="ball" @dblclick="generateResponse">
