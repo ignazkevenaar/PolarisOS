@@ -77,6 +77,7 @@ const selectItem = (item) => {
         @click="startApplication(application.applicationID)"
       >
         <IconContainer :icon="application.icon"></IconContainer>
+        <!-- Move into DockButton -->
         <span class="notRunning text-shadow" v-if="!application.running"
           >...</span
         >
@@ -86,6 +87,7 @@ const selectItem = (item) => {
       <DockButton
         v-for="(item, itemIndex) in dynamicDockItems"
         :key="itemIndex"
+        :title="item.options?.title"
         @click="selectItem(item)"
       >
         <IconContainer :icon="item.icon ?? item.options?.icon"></IconContainer>
@@ -121,6 +123,6 @@ const selectItem = (item) => {
 .notRunning {
   position: absolute;
   bottom: 0;
-  inset-inline-start: 0;
+  inset-inline-start: 2px;
 }
 </style>
