@@ -46,7 +46,7 @@ watch(
       selectedItem.value = null;
       return;
     }
-    const contents = toValue(await chain.at(-1)?.contents);
+    const contents = await chain.at(-1)?.contents;
     if (generation !== selectionGeneration) return;
     selectedItem.value = contents?.[key] ?? null;
   },
@@ -105,7 +105,7 @@ const goUp = () => activate(Math.max(openPath.value.length - 1, 0));
               ? activate(index, selectedKey, selectedItem, true)
               : undefined
           "
-          :name="fileOrFolder.name ?? openPath[index - 1] ?? selectedKey"
+          :name="index === 0 ? '' : (openPath[index - 1] ?? selectedKey)"
           :selected="index === breadcrumbItems.length - 1"
         />
         <MosaicArrow v-if="index < breadcrumbItems.length - 1" />

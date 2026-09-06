@@ -12,17 +12,17 @@
     rgb(0 0 0 / 40%) 60%,
     rgb(255 255 255 / 60%) 60%
   );
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 
   &::after {
     display: block;
     position: absolute;
     top: 2px;
     left: 1.5px;
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-    border-left: 8px solid rgb(var(--local-color));
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    border-left: 7px solid rgb(var(--local-color));
     width: 0;
     height: 0;
     content: "";

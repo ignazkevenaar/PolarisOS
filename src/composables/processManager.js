@@ -147,12 +147,13 @@ export function useProcessManager() {
   };
 
   const openFile = async (fileName, file) => {
-    // Get type
-    if (file.type === "application") {
-      console.log("Starting application", fileName, file);
-      await startApplication(fileName);
+    const extension = fileName.split(".").pop();
+
+    if (extension === "app") {
+      console.log("Starting application", file.applicationID, file);
+      await startApplication(file.applicationID);
     } else {
-      const targetApplicationID = fileAssociations.value[file.extension];
+      const targetApplicationID = fileAssociations.value[extension];
       if (targetApplicationID) {
         const path = file.content;
         console.log("going to open with application", targetApplicationID);

@@ -42,7 +42,7 @@ watch(
       :key
       :fileOrFolder="item"
       :selected="selectedKey === key"
-      :name="item.name ?? key"
+      :name="key"
       @click.prevent.stop="emit('activate', depth, key, item)"
       @dblclick.prevent="emit('activate', depth, key, item, true)"
     />

@@ -55,7 +55,7 @@ watch(
           "
         >
           <span>
-            {{ item.name ?? key }}
+            {{ key }}
           </span>
           <MosaicArrow v-if="item.type === 'folder'"></MosaicArrow>
         </button>
@@ -78,13 +78,15 @@ ul {
   }
 
   button {
+    --border-width: 1px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
     appearance: none;
     border-inline-width: 0;
-    padding: 2px 4px;
+    padding: 0px 2px;
     width: 100%;
 
     &:not(.active) {

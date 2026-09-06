@@ -30,7 +30,7 @@ const selectedClasses = computed(() => ({
       <IconContainer :icon="fileOrFolder.icon ?? iconMap[fileOrFolder.type]" />
     </div>
     <label class="selectable" :class="selectedClasses">{{
-      name || fileOrFolder.name || fileOrFolder.part || fileOrFolder.type
+      name || fileOrFolder.part
     }}</label>
   </div>
 </template>
@@ -53,9 +53,14 @@ const selectedClasses = computed(() => ({
 
   label {
     max-width: 100%;
+    min-height: 1em;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &:empty {
+      opacity: 0;
+    }
 
     &.selectable {
       padding-inline: 8px;

@@ -14,6 +14,7 @@
 - Improve fallback routing
 - Rework window manager to be reparenting.
 - Migrate applications to manifests.
+- Improve filemanager with selection and file associations.
 
 ## 0.3.0 - 2026-07-16
 

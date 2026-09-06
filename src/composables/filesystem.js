@@ -1,12 +1,11 @@
-import { ref, toValue } from "vue";
+import { ref, toValue, isRef } from "vue";
 import filesystem from "../config/filesystem";
 
 const reactiveFilesystem = ref(undefined);
 
-// eslint-disable-next-line no-unused-vars
-const parseFolder = async ([name, fileOrFolder]) => {
-  if (fileOrFolder === undefined) return fileOrFolder;
+const isComputed = (value) => isRef(value) && "effect" in value;
 
+const parseFolder = async (fileOrFolder) => {
   if (fileOrFolder.type !== "folder") {
     return fileOrFolder;
   }
@@ -16,24 +15,28 @@ const parseFolder = async ([name, fileOrFolder]) => {
   delete fileOrFolder.contents;
   Object.defineProperty(fileOrFolder, "contents", {
     get: async () => {
-      if (typeof fileOrFolder._contents === "function")
+      if (isComputed(fileOrFolder._contents)) {
+        return toValue(fileOrFolder._contents);
+      } else if (typeof fileOrFolder._contents === "function")
         return toValue(await fileOrFolder._contents());
 
       return fileOrFolder._contents;
     },
   });
 
-  // Use newly created getter :)
-  Object.entries(toValue(await fileOrFolder.contents)).map(parseFolder);
+  Object.values(toValue(await fileOrFolder.contents)).map(parseFolder);
 
   return fileOrFolder;
 };
 
+const rootPath = "";
 const pathSeparator = "/";
 
 const initalizeFS = async () => {
-  const result = await parseFolder([undefined, filesystem]);
-  reactiveFilesystem.value = result;
+  const result = await parseFolder(filesystem[rootPath]);
+  reactiveFilesystem.value = {
+    [rootPath]: result,
+  };
 };
 initalizeFS();
 
@@ -60,12 +63,12 @@ export function useFilesystem() {
       ? pathOrParts
       : splitPathToParts(pathOrParts);
 
-    const outputFolders = [reactiveFilesystem.value];
-    let reference = await reactiveFilesystem.value.contents;
+    const outputFolders = [reactiveFilesystem.value[rootPath]];
+    let reference = await outputFolders.at(-1).contents;
 
     try {
       for (const [partIndex, part] of parts.entries()) {
-        if (part === "" && partIndex === 0) continue; // Skip
+        if (part === rootPath && partIndex === 0) continue; // Skip
 
         const fileOrFolder = reference?.[part];
 
@@ -92,6 +95,7 @@ export function useFilesystem() {
   const iconMap = {
     folder: "folder",
     file: "file",
+    undefined: "file",
   };
 
   return {
