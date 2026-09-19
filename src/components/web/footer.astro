@@ -3,18 +3,23 @@ const currentYear = new Date().getFullYear();
 ---
 
 <footer>
-  <p class="perPage"><slot /></p>
+  <p class="perPage">
+    <slot />
+  </p>
   Copyright &copy; 1994 — {currentYear}
-  by <a href="https://ignaz.design" target="_blank">Ignaz.design</a>, All rights
-  reserved. PolarisOS™ and the PolarisOS™ "Globe and Star"-logo are trademarks
-  (™) of the Celestial™ Software Cooperation.
+  by{" "}
+  <a href="https://ignaz.design" target="_blank">
+    Ignaz.design
+  </a>
+  , All rights reserved. PolarisOS™ and the PolarisOS™ "Globe and Star"-logo are
+  trademarks (™) of the Celestial™ Software Cooperation.
 </footer>
 
 <style>
   footer {
-    text-align: center;
     padding: 8px;
     font-size: 0.7rem;
+    text-align: center;
 
     p.perPage {
       margin-top: 0;

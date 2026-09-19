@@ -50,28 +50,28 @@ const onMouseDown = () => {
 button {
   --border-width: 1px;
   --icon-shadow-depth: 2px;
-
-  appearance: none;
-  padding: 0;
-  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.25);
-  font-family: inherit;
   display: flex;
   flex-direction: column;
+
+  appearance: none;
+  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.25);
+  padding: 0;
   overflow: hidden;
+  font-family: inherit;
   user-select: none;
 
   > div {
+    display: flex;
     padding: 2px;
     overflow: hidden;
-    display: flex;
   }
 
   span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     flex: 0 0 auto;
     width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .container {
@@ -81,12 +81,12 @@ button {
   }
 
   .iconContainer {
-    width: 72px;
-    height: 72px;
-    aspect-ratio: 1;
     display: grid;
     place-items: center;
     box-sizing: border-box;
+    aspect-ratio: 1;
+    width: 72px;
+    height: 72px;
   }
 }
 </style>

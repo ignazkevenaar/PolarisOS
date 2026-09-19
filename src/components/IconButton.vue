@@ -27,14 +27,14 @@ defineProps({
 
 <style lang="css" scoped>
 button {
-  position: relative;
   display: flex;
+  position: relative;
   flex-direction: column;
   align-items: center;
-  font-family: inherit;
+  outline: 1px solid color-mix(in oklch, var(--local-color-dark), black 50%);
   padding: 4px 16px;
   font-size: 1em;
-  outline: 1px solid color-mix(in oklch, var(--local-color-dark), black 50%);
+  font-family: inherit;
 
   &:disabled > * {
     opacity: 0.5;

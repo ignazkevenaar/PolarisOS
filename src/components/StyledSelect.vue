@@ -36,17 +36,17 @@ label {
 }
 
 select {
-  appearance: none;
-  padding: 4px 6px;
-  width: 100%;
-  background-color: transparent;
-  border: none;
   position: relative;
+  appearance: none;
   z-index: 1;
-  padding-inline-end: 24px; /* .arrows width */
   outline: none;
-  font-family: inherit;
+  border: none;
+  background-color: transparent;
+  padding: 4px 6px;
+  padding-inline-end: 24px; /* .arrows width */
+  width: 100%;
   font-size: 1rem;
+  font-family: inherit;
 
   &:open + .background .bevel {
     display: none;
@@ -60,14 +60,14 @@ select {
   &:focus {
     + .background::before {
       --border-offset: 2px;
-
-      content: "";
       display: block;
       position: absolute;
       inset: calc(-1 * var(--border-offset));
-      background-color: transparent;
-      border-radius: calc(var(--radius) + var(--border-offset));
       border: var(--border-offset) solid rgb(var(--color-tertiary-active));
+      border-radius: calc(var(--radius) + var(--border-offset));
+      background-color: transparent;
+
+      content: "";
     }
   }
 }
@@ -75,47 +75,47 @@ select {
 .background {
   --radius: 4px;
   --border-offset: 1px;
+  display: flex;
 
   position: absolute;
-  inset: 0;
-  display: flex;
   z-index: 0;
+  inset: 0;
   border: var(--border-offset) solid black;
   border-radius: calc(var(--radius) + var(--border-offset));
 
   .fill {
     flex: 1 1 auto;
+    border-inline-end-width: 1px;
     border-start-start-radius: var(--radius);
     border-end-start-radius: var(--radius);
-    border-inline-end-width: 1px;
   }
 
   .arrows {
+    border-inline-start-width: 1px;
     border-start-end-radius: var(--radius);
     border-end-end-radius: var(--radius);
-    border-inline-start-width: 1px;
   }
 }
 
 .arrows {
   --arrow-size: 3px;
-
-  padding: 2px 6px;
-  pointer-events: none;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 2px;
 
+  padding: 2px 6px;
+  pointer-events: none;
+
   &::before,
   &::after {
-    content: "";
     display: block;
+    filter: drop-shadow(0 1px 0 var(--local-color-light));
+    border-right: var(--arrow-size) solid transparent;
+    border-left: var(--arrow-size) solid transparent;
     width: 0;
     height: 0;
-    border-left: var(--arrow-size) solid transparent;
-    border-right: var(--arrow-size) solid transparent;
-    filter: drop-shadow(0 1px 0 var(--local-color-light));
+    content: "";
   }
 
   &::before {

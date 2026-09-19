@@ -25,10 +25,10 @@ const baseURL = import.meta.env.BASE_URL;
 
 <style lang="css" scoped>
 .face {
-  height: 100%;
-  width: 100%;
   position: relative;
   filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.25));
+  width: 100%;
+  height: 100%;
 }
 
 .hand {

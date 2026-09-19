@@ -20,11 +20,11 @@ setInterval(() => {
 <style>
 .letter {
   mix-blend-mode: overlay;
-  font-style: italic;
+  border-radius: 100%;
   width: 100%;
   color: white;
+  font-style: italic;
   text-shadow: 0 0 10px black;
-  border-radius: 100%;
 }
 
 .v-enter-active,

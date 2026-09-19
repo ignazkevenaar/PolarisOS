@@ -23,7 +23,9 @@ const categories = Object.entries(categoriesWithGames).map(
   </div>
 
   <div class="header" style={`--mask: url("${NeedForSpeedTwo}")`}>
-    <div class="graphic"><div class="graphic"></div></div>
+    <div class="graphic">
+      <div class="graphic"></div>
+    </div>
 
     <div class="triangle zjoink" style={`--mask: url("${NeedForSpeedOne}")`}>
       <div class="stripes"></div>
@@ -41,38 +43,34 @@ const categories = Object.entries(categoriesWithGames).map(
     <nav style={`--mask: url("${NeedForSpeedFour}")`}>
       <div class="graphic"></div>
       <ul>
-        {
-          categories.map(([categoryHash, categoryTitle]) => (
-            <li>
-              <a href={`${baseURL}/web/aboutme/games#${categoryHash}`}>
-                <span class="inside">
-                  <span class="reverseSkew">{categoryTitle}...</span>
-                </span>
-              </a>
-            </li>
-          ))
-        }
+        {categories.map(([categoryHash, categoryTitle]) => (
+          <li>
+            <a href={`${baseURL}/web/aboutme/games#${categoryHash}`}>
+              <span class="inside">
+                <span class="reverseSkew">{categoryTitle}...</span>
+              </span>
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
 
     <div class="grid">
-      {
-        Object.entries(categoriesWithGames).map(([categoryKey, category]) => (
-          <div class="category" id={categoryKey}>
-            <h2>{category.title}</h2>
-            <div class="games">
-              {category.games.map((game) => (
-                <div class="game">
-                  <img
-                    src={`${baseURL}/web/aboutme/games/${game.image}`}
-                    alt={game.title}
-                  />
-                </div>
-              ))}
-            </div>
+      {Object.entries(categoriesWithGames).map(([categoryKey, category]) => (
+        <div class="category" id={categoryKey}>
+          <h2>{category.title}</h2>
+          <div class="games">
+            {category.games.map((game) => (
+              <div class="game">
+                <img
+                  src={`${baseURL}/web/aboutme/games/${game.image}`}
+                  alt={game.title}
+                />
+              </div>
+            ))}
           </div>
-        ))
-      }
+        </div>
+      ))}
 
       <Footer>
         The layout and graphics of this page are inspired by the menu of Need
