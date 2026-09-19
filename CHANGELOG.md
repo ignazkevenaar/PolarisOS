@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Update dependencies.
+
 ## 0.4.0 - 2026-09-19
 
 ### Added
