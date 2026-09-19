@@ -6,9 +6,8 @@ export function useBrowser() {
   const openLink = (URL) => {
     if (!URL) return;
 
-    openFile(undefined, {
+    openFile(".link", {
       type: "file",
-      extension: "link",
       content: URL,
     });
   };
